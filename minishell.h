@@ -62,7 +62,7 @@ typedef struct s_env
     char            *key;
     char            *value;
     struct s_env    *next;
-} t_env; //linked list for each key = value of env list
+} t_env; //linked list for each key-value pair of env list
 
 typedef struct s_token
 {
