@@ -18,7 +18,7 @@
 # include <sys/stat.h>// stat/lstat/fstat
 # include <errno.h>
 # include <termcap.h>
-# include "libft.h"
+# include "libft/libft.h"
 /*======================Forward Declaration=============*/
 typedef struct s_env t_env;
 typedef struct s_cmd t_cmd;
@@ -86,5 +86,9 @@ typedef struct s_cmd
 } t_cmd;
 
 /*=================functions====================*/
+void    extract_key_value(char *str,char **key, char **value);
+void	ft_lstadd_back_env(t_env **env, t_env *new);
+t_env   *init_env(char **envp);
+void    init_cmds(char *line);
 
 #endif
