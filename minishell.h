@@ -5,7 +5,7 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/types.h>
-# include <sys/acl.h>
+//# include <sys/acl.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
@@ -18,7 +18,7 @@
 # include <sys/stat.h>// stat/lstat/fstat
 # include <errno.h>
 # include <termcap.h>
-
+# include "libft.h"
 /*======================Forward Declaration=============*/
 typedef struct s_env t_env;
 typedef struct s_cmd t_cmd;
