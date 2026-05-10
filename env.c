@@ -1,24 +1,27 @@
 #include "minishell.h"
 
-void    extract_key_value(char *str,char **key, char **value)
+int    extract_key_value(char *str,char **key, char **value)
 {
     char    *sign;
 
+    *key = NULL;
+    *value = NULL;
     if (!str)
-    {
-        *key = NULL;
-        *value = NULL;
-        return;
-    }
+        return (0);
     sign = ft_strchr(str, '=');
     if (!sign)
     {
         *key = ft_strdup(str);
-        *value = NULL;
-        return;
+        if (!*key)
+            return (0);
+        return (1);
     }
     *key = ft_substr(str, 0, sign - str);
     *value = ft_strdup(sign + 1);
+    if (!(*key) ||!(*value))
+        return (0);
+    else
+        return (1);
 }
 
 void	ft_lstadd_back_env(t_env **env, t_env *new)
@@ -38,6 +41,22 @@ void	ft_lstadd_back_env(t_env **env, t_env *new)
 	}
 }
 
+void    free_envs(t_env *env)
+{
+    t_env *tmp;
+
+    while (env)
+    {
+        tmp = env->next;
+        if (env->value)
+            free(env->value);
+        if (env->key)
+            free(env->key);
+        free(env);
+        env = tmp;
+    }
+}
+
 t_env   *init_env(char **envp)
 {
     t_env   *env;
@@ -49,8 +68,19 @@ t_env   *init_env(char **envp)
     while (envp[i] != NULL)
     {
         node = malloc(sizeof(t_env));
-        if (!node) return (NULL);
-        extract_key_value(envp[i], &node->key, &node->value);
+        if (!node) 
+        {
+            free_envs(env);
+            return (NULL);
+        }
+        if (!extract_key_value(envp[i], &node->key, &node->value))
+        {
+            free(node->key);
+            free(node->value);
+            free(node);
+            free_envs(env);
+            return (NULL);
+        }
         node->next = NULL;
         ft_lstadd_back_env(&env, node);
         i++;

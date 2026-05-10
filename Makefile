@@ -3,7 +3,8 @@ HEADER      = minishell.h libft/libft.h
 
 MANDATORY_SRC	= main.c\
 				env.c \
-				cmds.c
+				tokens.c \
+				utils.c \
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 
@@ -16,7 +17,7 @@ CFLAGS	= -Wall -Wextra -Werror -g
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(MANDATORY_OBJ)
-	$(CC) $(CFLAGS) $(MANDATORY_OBJ) $(LIBFT) -o $(NAME)
+	$(CC) $(CFLAGS) $(MANDATORY_OBJ) $(LIBFT) -lreadline -o $(NAME)
 	@echo "Mandatory part is built."
 
 $(LIBFT):

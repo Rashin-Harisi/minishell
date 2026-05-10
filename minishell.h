@@ -86,9 +86,22 @@ typedef struct s_cmd
 } t_cmd;
 
 /*=================functions====================*/
-void    extract_key_value(char *str,char **key, char **value);
+// ENV's functions
+int    extract_key_value(char *str,char **key, char **value);
 void	ft_lstadd_back_env(t_env **env, t_env *new);
+void    free_envs(t_env *env);
 t_env   *init_env(char **envp);
-void    init_cmds(char *line);
+// TOKENS' functions
+void    free_tokens(t_token *tokens);
+void	ft_lstadd_back_token(t_token **token, t_token *new);
+t_token    *init_token(char *tmp, t_token *node);
+char    *each_part_extract(char *line, int *index, int *syntax_error);
+void    skip_spaces(char *line, int *index);
+t_token    *create_tokens(char *line);
+// CMDS' functions
+//t_cmd   *init_cmds(t_token *tokens);
+// UTILS' functions
+void	print_envs(t_env *env);
+void	print_tokens(t_token *tokens);
 
 #endif
