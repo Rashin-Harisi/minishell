@@ -7,11 +7,16 @@ int main(int argc, char **argv, char **envp)
 	char	*line;
 	char	*prompt;
 	t_token	*tokens;
+	char	**paths;
 
-	(void)argc;
 	(void)argv;
+	if (argc != 1) return (1);
 	prompt = "minishell$ ";
-    shell.env = init_env(envp);
+	if (envp[0] == NULL)
+		shell.env = create_minimall_envp();
+    else
+		shell.env = init_env(envp);
+	paths = get_paths(shell.env);
 	while (1)
 	{
 		line = readline(prompt);
@@ -24,6 +29,7 @@ int main(int argc, char **argv, char **envp)
 		//shell.cmds = init_cmds(tokens);
 
 		free(line);
+		//free_arr(paths); it is need to be developed
 		free_envs(shell.env);
 		free_tokens(tokens);
 	}

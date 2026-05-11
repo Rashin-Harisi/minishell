@@ -18,6 +18,7 @@
 # include <sys/stat.h>// stat/lstat/fstat
 # include <errno.h>
 # include <termcap.h>
+# include <linux/limits.h>
 # include "libft/libft.h"
 /*======================Forward Declaration=============*/
 typedef struct s_env t_env;
@@ -91,6 +92,9 @@ int    extract_key_value(char *str,char **key, char **value);
 void	ft_lstadd_back_env(t_env **env, t_env *new);
 void    free_envs(t_env *env);
 t_env   *init_env(char **envp);
+t_env   *create_minimal_envp(void);
+// PATH's function
+char	**get_paths(t_env *env);
 // TOKENS' functions
 void    free_tokens(t_token *tokens);
 void	ft_lstadd_back_token(t_token **token, t_token *new);
