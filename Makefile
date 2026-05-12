@@ -2,9 +2,12 @@ NAME		= minishell
 HEADER      = minishell.h libft/libft.h
 
 MANDATORY_SRC	= main.c\
-				env.c \
-				tokens.c \
-				utils.c \
+				./env/env.c \
+				./env/create_minimal_envp.c \
+				./env/get_path.c \
+				./src/parsing/tokens.c \
+				 #./src/parsing/cmds.c 
+				./utils/utils.c \
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 
