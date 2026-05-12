@@ -6,8 +6,10 @@ MANDATORY_SRC	= main.c\
 				./env/create_minimal_envp.c \
 				./env/get_path.c \
 				./src/parsing/tokens.c \
-				 #./src/parsing/cmds.c 
 				./utils/utils.c \
+				./signals/signals.c \
+				./utils/prompt.c \
+				./env/helper.c
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 
@@ -15,7 +17,7 @@ LIBFT_PATH	= ./libft
 LIBFT		= libft.a
 
 CC		= cc
-CFLAGS	= -Wall -Wextra -Werror -g
+CFLAGS	= -Wall -Wextra -Werror -g -I.
 
 all: $(NAME)
 

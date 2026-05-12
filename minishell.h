@@ -28,6 +28,14 @@ typedef struct s_token t_token;
 typedef enum e_redir_type t_redir_type;
 typedef struct s_redir t_redir;
 
+/*===================== marcos for custome terminal============*/
+# define GREEN "\001\033[32m\002"
+# define RED "\001\033[31m\002"
+# define CYAN "\001\033[36m\002"
+# define YELLOW  "\001\033[33m\002"
+# define BLUE    "\001\033[34m\002"
+# define RESET "\001\033[0m\002"
+
 /*================Enums=================*/
 
 typedef enum e_token_type
@@ -93,8 +101,14 @@ void	ft_lstadd_back_env(t_env **env, t_env *new);
 void    free_envs(t_env *env);
 t_env   *init_env(char **envp);
 t_env   *create_minimal_envp(void);
+char    *get_env_value(t_env *env, char *key);
 // PATH's function
 char	**get_paths(t_env *env);
+void	free_paths(char **paths);
+// PROMPT's functions
+char    *create_prompt(t_shell *shell);
+// SIGNAL's functions
+void    init_signals(void);
 // TOKENS' functions
 void    free_tokens(t_token *tokens);
 void	ft_lstadd_back_token(t_token **token, t_token *new);
@@ -107,5 +121,6 @@ t_token    *create_tokens(char *line);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
+void	print_paths(char **paths);
 
 #endif

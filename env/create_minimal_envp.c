@@ -41,7 +41,7 @@ t_env   *create_minimal_envp(void)
     {
         perror("getcwd() error");
         free_envs(env);
-        retrun (NULL);
+        return (NULL);
     }
     if (!add_node_to_env(&env, "PWD", cwd))
         return (free_envs(env), NULL);

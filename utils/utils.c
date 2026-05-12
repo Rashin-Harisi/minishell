@@ -51,3 +51,21 @@ void	print_tokens(t_token *tokens)
 		tokens = tokens->next;
 	}
 }
+
+void	print_paths(char **paths)
+{
+	int	i;
+
+	i = 0;
+	printf("========== PATHS ==========\n");
+	if (!paths)
+	{
+		printf("(null)\n");
+		return ;
+	}
+	while (paths[i])
+	{
+		printf("paths[%d] = [%s]\n", i, paths[i]);
+		i++;
+	}
+}
