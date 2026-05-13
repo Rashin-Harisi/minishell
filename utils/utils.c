@@ -36,6 +36,7 @@ char	*get_token_type_name(t_token_type type)
 
 void	print_tokens(t_token *tokens)
 {
+	if (!tokens) return ;
 	printf("======== TOKENS =========\n");
 
 	while (tokens)
@@ -68,4 +69,18 @@ void	print_paths(char **paths)
 		printf("paths[%d] = [%s]\n", i, paths[i]);
 		i++;
 	}
+}
+
+int	is_empty_line(char *line)
+{
+	int i;
+
+	i = 0;
+	while (line[i])
+	{
+		if (line[i] != ' ' && line[i] != '\t')
+			return (0);
+		i++;
+	}
+	return (1);
 }

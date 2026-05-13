@@ -9,7 +9,8 @@ MANDATORY_SRC	= main.c\
 				./utils/utils.c \
 				./signals/signals.c \
 				./utils/prompt.c \
-				./env/helper.c
+				./env/helper.c \
+				./src/parsing/syntax_check.c
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 

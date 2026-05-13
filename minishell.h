@@ -116,11 +116,14 @@ t_token    *init_token(char *tmp, t_token *node);
 char    *each_part_extract(char *line, int *index, int *syntax_error);
 void    skip_spaces(char *line, int *index);
 t_token    *create_tokens(char *line);
+// SYNTAX_CHECK's functions
+int syntax_check(t_token *tokens);
 // CMDS' functions
 //t_cmd   *init_cmds(t_token *tokens);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
 void	print_paths(char **paths);
+int	is_empty_line(char *line);
 
 #endif

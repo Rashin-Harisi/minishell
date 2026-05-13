@@ -8,6 +8,7 @@ int main(int argc, char **argv, char **envp)
 	char	*prompt;
 	t_token	*tokens;
 	char	**paths;
+	int		syntax_error = 0;
 
 	(void)argv;
 	if (argc != 1) return (1);
@@ -30,10 +31,25 @@ int main(int argc, char **argv, char **envp)
 			printf("exit\n");
 			break;
 		}
+		if (is_empty_line(line))
+		{
+			free(line);
+			continue;
+		}
 		if (*line) add_history(line);
 		tokens = create_tokens(line);
-
-		print_tokens(tokens);
+		if (!tokens && !is_empty_line(line))
+		{
+			printf("Syntax error\n");
+		    rl_on_new_line();
+		}
+		syntax_error = syntax_check(tokens);
+		if (syntax_error)
+		{
+			printf("Syntax error\n");
+		    rl_on_new_line();
+		}
+		if (!syntax_error) print_tokens(tokens);
 		//shell.cmds = init_cmds(tokens);
 		free(line);
 		free_tokens(tokens);
