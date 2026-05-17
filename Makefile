@@ -1,5 +1,5 @@
 NAME		= minishell
-HEADER      = minishell.h libft/libft.h
+HEADER	  = minishell.h libft/libft.h
 
 MANDATORY_SRC	= main.c\
 				env.c \

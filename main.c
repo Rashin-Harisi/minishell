@@ -3,7 +3,7 @@
 
 int main(int argc, char **argv, char **envp)
 {
-    t_shell shell;
+	t_shell shell;
 	char	*line;
 	char	*prompt;
 	t_token	*tokens;
@@ -11,7 +11,7 @@ int main(int argc, char **argv, char **envp)
 	(void)argc;
 	(void)argv;
 	prompt = "minishell$ ";
-    shell.env = init_env(envp);
+	shell.env = init_env(envp);
 	while (1)
 	{
 		line = readline(prompt);
@@ -28,5 +28,5 @@ int main(int argc, char **argv, char **envp)
 		free_tokens(tokens);
 	}
 	
-    return (0);
+	return (0);
 }

@@ -31,73 +31,107 @@ typedef struct s_redir t_redir;
 
 typedef enum e_token_type
 {
-    TOKEN_WORD,
-    TOKEN_PIPE,
-    TOKEN_REDIR_IN,
-    TOKEN_REDIR_OUT,
-    TOKEN_APPEND,
-    TOKEN_HEREDOC
+	TOKEN_WORD,
+	TOKEN_PIPE,
+	TOKEN_AND,
+	TOKEN_OR,
+	TOKEN_SEMICOLON,
+	TOKEN_REDIR_IN,
+	TOKEN_REDIR_OUT,
+	TOKEN_APPEND,
+	TOKEN_HEREDOC,
+	TOKEN_PARENTH_OPEN,
+	TOKEN_PARENTH_CLOSE,
 } t_token_type; // different types of token that might given to in the terminal
+				// NOTE: Add tokens for shell operators. Example: &&, ||, ;, ( and )
 
 typedef enum e_redir_type
 {
-    REDIR_IN,
-    REDIR_OUT,
-    REDIR_APPEND,
-    REDIR_HEREDOC
-} t_redir_type;
+	REDIR_IN,
+	REDIR_OUT,
+	REDIR_APPEND,
+	REDIR_HEREDOC
+} t_redir_type; //Might be redundant due to token types?
+
+typedef enum e_role
+{
+	ROLE_CMD,
+	ROLE_ARG,
+	ROLE_FILE,
+	ROLE_LIMITER,
+	ROLE_ENV_ASSIGNMENT,
+	ROLE_NONE
+} t_role; //Used for building and assigning later
+
+typedef	enum e_expect
+{
+	EXPECT_CMD,
+	EXPECT_CMD_BODY,
+	EXPECT_FILE,
+	EXPECT_LIMITER
+} t_expect; //Used for env_assignments and/or Errors
 
 /*===================Structs====================*/
 
+typedef	struct s_parser
+{
+	t_token		*head;
+	t_token		*curr;
+	t_expect	expect;
+	t_cmd		*currentcmd;
+	int			error;
+} t_parser;
+
 typedef struct s_shell
 {
-    t_env   *env;
-    t_cmd   *cmds;
-    int     exit_status;
-    int     interactive; // terminal or script =>isatty(STDIN_FILEN)
+	t_env	*env;
+	t_cmd	*cmds;
+	int	 	exit_status;
+	int		interactive; // terminal or script =>isatty(STDIN_FILEN)
 } t_shell;
 
 typedef struct s_env
 {
-    char            *key;
-    char            *value;
-    struct s_env    *next;
+	char			*key;
+	char			*value;
+	struct s_env	*next;
 } t_env; //linked list for each key-value pair of env list
 
 typedef struct s_token
 {
-    char            *value;
-    t_token_type   type;
-    struct s_token  *next;
+	char			*value;
+	t_token_type	type;
+	t_role			role;
+	struct s_token  *next;
 } t_token;
 
 typedef struct s_redir
 {
-    t_redir_type     type;
-    char            *filename;
-    struct s_redir  *next;
+	t_redir_type	 type;
+	char			*filename;
+	struct s_redir  *next;
 } t_redir;
 
 typedef struct s_cmd
 {
-    char            **args;
-    t_redir         *redirects;
-    struct s_cmd    *next;
+	char			**args;
+	t_redir			*redirects;
+	struct s_cmd	*next;
 } t_cmd;
 
 /*=================functions====================*/
 // ENV's functions
-int    extract_key_value(char *str,char **key, char **value);
+int		extract_key_value(char *str,char **key, char **value);
 void	ft_lstadd_back_env(t_env **env, t_env *new);
-void    free_envs(t_env *env);
-t_env   *init_env(char **envp);
+void	free_envs(t_env *env);
+t_env	*init_env(char **envp);
 // TOKENS' functions
-void    free_tokens(t_token *tokens);
+void	free_tokens(t_token *tokens);
 void	ft_lstadd_back_token(t_token **token, t_token *new);
-t_token    *init_token(char *tmp, t_token *node);
-char    *each_part_extract(char *line, int *index, int *syntax_error);
-void    skip_spaces(char *line, int *index);
-t_token    *create_tokens(char *line);
+t_token	*init_token(char *tmp, t_token *node);
+char	*each_part_extract(char *line, int *index, int *syntax_error);
+void	skip_spaces(char *line, int *index);
+t_token	*create_tokens(char *line);
 // CMDS' functions
 //t_cmd   *init_cmds(t_token *tokens);
 // UTILS' functions
