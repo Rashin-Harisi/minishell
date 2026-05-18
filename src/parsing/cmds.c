@@ -1,21 +1,30 @@
 #include "minishell.h"
 
-t_cmd   *init_cmds(t_token *tokens)
+
+void    free_cmds(t_cmd *cmds)
+{
+}
+
+void    ft_lstadd_back_cmds(t_cmd **cmds, t_cmd *node)
+{}
+
+t_cmd *init_cmds(t_token **tokens)
+{}
+
+t_cmd   *create_cmds(t_token *tokens)
 {
     t_cmd   *cmds;
-    int     i;
     t_cmd   *tmp;
 
-    i = 0;
     cmds = NULL;
-    while (tokens[i].next != NULL)
+    while (tokens)
     {
-        tmp = malloc(sizeof(cmds));
-        if (!tmp) return (NULL);
-        tmp->args = tokens[i].value;
-        
-        tmp->redirects = malloc(sizeof(t_redir));
-        if (!tmp->redirects) return (NULL);
-        tmp->redirects->type
+        tmp = malloc(sizeof(t_cmd));
+        if(!tmp) return (free_cmds(cmds), NULL);
+        tmp = init_cmds(&tokens);
+        ft_lstadd_back_cmds(&cmds, tmp);
+        if (tokens && tokens->type == TOKEN_PIPE)
+            tokens = tokens->next;
     }
+    return (cmds);
 }

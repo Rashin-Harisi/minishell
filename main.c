@@ -50,7 +50,7 @@ int main(int argc, char **argv, char **envp)
 		    rl_on_new_line();
 		}
 		if (!syntax_error) print_tokens(tokens);
-		//shell.cmds = init_cmds(tokens);
+		shell.cmds = create_cmds(tokens);
 		free(line);
 		free_tokens(tokens);
 	}
