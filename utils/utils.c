@@ -84,3 +84,57 @@ int	is_empty_line(char *line)
 	}
 	return (1);
 }
+
+void	print_redirs(t_redir *redir)
+{
+	while (redir)
+	{
+		printf("    redir type: ");
+
+		if (redir->type == REDIR_IN)
+			printf("REDIR_IN");
+		else if (redir->type == REDIR_OUT)
+			printf("REDIR_OUT");
+		else if (redir->type == REDIR_APPEND)
+			printf("REDIR_APPEND");
+		else if (redir->type == REDIR_HEREDOC)
+			printf("REDIR_HEREDOC");
+
+		printf("\n");
+
+		printf("    filename: %s\n", redir->filename);
+
+		redir = redir->next;
+	}
+}
+
+void	print_cmds(t_cmd *cmds)
+{
+	int	i;
+	int	cmd_num;
+
+	i = 0;
+	cmd_num = 1;
+
+	while (cmds)
+	{
+		printf("========== CMD %d ==========\n", cmd_num);
+
+		printf("ARGS:\n");
+
+		i = 0;
+		while (cmds->args && cmds->args[i])
+		{
+			printf("    args[%d] = %s\n", i, cmds->args[i]);
+			i++;
+		}
+
+		printf("REDIRECTIONS:\n");
+		print_redirs(cmds->redirects);
+
+		printf("\n");
+
+		cmds = cmds->next;
+		cmd_num++;
+	}
+}

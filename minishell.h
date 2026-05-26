@@ -119,11 +119,13 @@ t_token    *create_tokens(char *line);
 // SYNTAX_CHECK's functions
 int syntax_check(t_token *tokens);
 // CMDS' functions
-//t_cmd   *init_cmds(t_token *tokens);
+t_cmd   *create_cmds(t_token *tokens);
+void    free_cmds(t_cmd *cmds);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
 void	print_paths(char **paths);
 int	is_empty_line(char *line);
+void	print_cmds(t_cmd *cmds);
 
 #endif
