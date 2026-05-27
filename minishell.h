@@ -121,6 +121,7 @@ int syntax_check(t_token *tokens);
 // CMDS' functions
 t_cmd   *create_cmds(t_token *tokens);
 void    free_cmds(t_cmd *cmds);
+void    expansion(t_shell *shell);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);

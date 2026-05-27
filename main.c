@@ -61,6 +61,7 @@ int main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
+		expansion(shell.cmds);
 		print_tokens(tokens);
 		print_cmds(shell.cmds);
 		free_cmds(shell.cmds);
