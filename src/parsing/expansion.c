@@ -15,7 +15,7 @@ char *find_var_value(char *var, t_env *envs)
 {
     while (envs)
     {
-        if (ft_strncmp(var, envs->key, ft_stlen(var)+1) == 0)
+        if (ft_strncmp(var, envs->key, ft_strlen(var)+1) == 0)
             return (envs->value);
         envs = envs->next;
     }
@@ -124,7 +124,7 @@ void    expansion_redir(t_redir *redir, t_env *envs)
     while (redir)
     {
         expanded = expansion_string(redir->filename, envs);
-        if (!expanded) return (NULL);
+        if (!expanded) return;
         free(redir->filename);
         redir->filename = expanded;
         redir = redir->next;
