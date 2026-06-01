@@ -62,6 +62,7 @@ int main(int argc, char **argv, char **envp)
 			continue;
 		}
 		expansion(&shell);
+		heredoc_preparation(shell.cmds);
 		print_tokens(tokens);
 		print_cmds(shell.cmds);
 		free_cmds(shell.cmds);

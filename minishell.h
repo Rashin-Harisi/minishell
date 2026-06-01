@@ -83,6 +83,7 @@ typedef struct s_token
 typedef struct s_redir
 {
     t_redir_type     type;
+    int              fd;
     char            *filename;
     struct s_redir  *next;
 } t_redir;
@@ -122,6 +123,8 @@ int syntax_check(t_token *tokens);
 t_cmd   *create_cmds(t_token *tokens);
 void    free_cmds(t_cmd *cmds);
 void    expansion(t_shell *shell);
+// HEARDOC_PREPRARTION's functions
+void    heredoc_preparation(t_cmd *cmds);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);

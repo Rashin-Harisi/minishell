@@ -89,6 +89,7 @@ t_redir *init_redirect(t_token *tokens)
 
     tmp = malloc(sizeof(t_redir));
     if (!tmp) return (NULL);
+    tmp->fd = -1;
     tmp->filename = ft_strdup(tokens->next->value);
     if (!tmp->filename) return(free(tmp), NULL);
     if (tokens->type == TOKEN_APPEND)
