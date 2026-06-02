@@ -45,5 +45,7 @@ t_env   *create_minimal_envp(void)
     }
     if (!add_node_to_env(&env, "PWD", cwd))
         return (free_envs(env), NULL);
+    if (!add_node_to_env(&env, "SHLVL", "1"))
+        return (free_envs(env), NULL);
     return (env);
 }
