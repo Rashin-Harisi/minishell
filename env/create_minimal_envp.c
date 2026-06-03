@@ -1,7 +1,7 @@
 #include "minishell.h"
 
 
-static t_env    *create_node(char *key, char *value)
+t_env    *create_env_node(char *key, char *value)
 {
     t_env   *node;
     node = malloc(sizeof(t_env));
@@ -23,7 +23,7 @@ static t_env    *create_node(char *key, char *value)
 static int add_node_to_env(t_env **env, char *key, char *value)
 {
     t_env   *node;
-    node = create_node(key, value);
+    node = create_env_node(key, value);
     if (!node) return (0);
     ft_lstadd_back_env(env, node);
     return (1);
