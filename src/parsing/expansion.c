@@ -40,13 +40,23 @@ char    *append_char(char *str, char s)
     return (append_str(str, new));
 }
 
-char    *expand_var(char *str, int *i, t_env *envs, char *expanded)
+char    *expand_var(char *str, int *i, t_shell *shell, char *expanded)
 {
     int     start;
     char    *var;
     char    *value;
+    char    *status;
 
     (*i)++;
+    if (str[*i] == '?')
+    {
+        (*i)++;
+        status = ft_itoa(shell->exit_status);
+        if (!status) return (NULL);
+        expanded = append_str(expanded,status);
+        free(status);
+        return (expanded);
+    }
     start = *i;
     while (str[*i] && is_specific_char(str[*i]))
         (*i)++;
@@ -54,14 +64,14 @@ char    *expand_var(char *str, int *i, t_env *envs, char *expanded)
         return (append_char(expanded, '$'));
     var = ft_substr(str, start, (*i) - start);
     if (!var) return (NULL);
-    value = find_var_value(var, envs);
+    value = find_var_value(var, shell->env);
     free(var);
     if (value)
         return (append_str(expanded, value));
     return (expanded); 
 }
 
-char    *expansion_string(char *str, t_env *envs)
+char    *expansion_string(char *str, t_shell *shell)
 {
     int     i;
     int     single_quote;
@@ -90,7 +100,7 @@ char    *expansion_string(char *str, t_env *envs)
         }
         if (str[i] == '$' && !single_quote)
         {
-            expanded = expand_var(str, &i, envs, expanded);
+            expanded = expand_var(str, &i, shell, expanded);
             if (!expanded) return (NULL);
             continue;
         }
@@ -101,7 +111,7 @@ char    *expansion_string(char *str, t_env *envs)
     return (expanded);
 }
 
-void    expansion_args(char **args, t_env *envs)
+void    expansion_args(char **args, t_shell *shell)
 {
     int i;
     char *expanded;
@@ -109,7 +119,7 @@ void    expansion_args(char **args, t_env *envs)
     i = 0;
     while (args[i])
     {
-        expanded = expansion_string(args[i], envs);
+        expanded = expansion_string(args[i], shell);
         if (!expanded) return;
         free(args[i]);
         args[i] = expanded;
@@ -117,13 +127,13 @@ void    expansion_args(char **args, t_env *envs)
     }
 }
 
-void    expansion_redir(t_redir *redir, t_env *envs)
+void    expansion_redir(t_redir *redir, t_shell *shell)
 {
     char    *expanded;
     
     while (redir)
     {
-        expanded = expansion_string(redir->filename, envs);
+        expanded = expansion_string(redir->filename, shell);
         if (!expanded) return;
         free(redir->filename);
         redir->filename = expanded;
@@ -134,14 +144,12 @@ void    expansion_redir(t_redir *redir, t_env *envs)
 void    expansion(t_shell *shell)
 {
     t_cmd   *cmds;
-    t_env   *envs;
 
     cmds = shell->cmds;
-    envs = shell->env;
     while (cmds)
     {
-        expansion_args(cmds->args, envs);
-        expansion_redir(cmds->redirects, envs);
+        expansion_args(cmds->args, shell);
+        expansion_redir(cmds->redirects, shell);
         cmds = cmds->next;
     }
 }

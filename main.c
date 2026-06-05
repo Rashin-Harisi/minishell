@@ -68,8 +68,8 @@ int main(int argc, char **argv, char **envp)
 			printf("There is something wrong in updating env\n");
 			continue;
 		}
-		//print_tokens(tokens);
-		//print_cmds(shell.cmds);
+		print_tokens(tokens);
+		print_cmds(shell.cmds);
 		free_cmds(shell.cmds);
 		free_tokens(tokens);
 		free(line);
