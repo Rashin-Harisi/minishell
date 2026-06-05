@@ -104,6 +104,7 @@ t_env   *init_env(char **envp);
 t_env   *create_minimal_envp(void);
 char    *get_env_value(t_env *env, char *key);
 t_env    *create_env_node(char *key, char *value);
+int builtin_update_env(t_shell *shell, t_cmd *cmd);
 // PATH's function
 char	**get_paths(t_env *env);
 void	free_paths(char **paths);

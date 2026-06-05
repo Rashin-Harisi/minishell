@@ -63,8 +63,13 @@ int main(int argc, char **argv, char **envp)
 		}
 		expansion(&shell);
 		heredoc_preparation(shell.cmds);
-		print_tokens(tokens);
-		print_cmds(shell.cmds);
+		if (builtin_update_env(&shell, shell.cmds))
+		{
+			printf("There is something wrong in updating env\n");
+			continue;
+		}
+		//print_tokens(tokens);
+		//print_cmds(shell.cmds);
 		free_cmds(shell.cmds);
 		free_tokens(tokens);
 		free(line);
