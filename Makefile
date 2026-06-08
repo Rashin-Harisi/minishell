@@ -14,7 +14,8 @@ MANDATORY_SRC	= main.c\
 				./src/parsing/cmds.c \
 				./src/parsing/expansion.c \
 				./src/heardoc_prepration/prepration.c \
-				./env/update_env.c
+				./env/update_env.c \
+				./src/parsing/builtin_funcs.c
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 

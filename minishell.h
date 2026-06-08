@@ -105,6 +105,7 @@ t_env   *create_minimal_envp(void);
 char    *get_env_value(t_env *env, char *key);
 t_env    *create_env_node(char *key, char *value);
 int builtin_update_env(t_shell *shell, t_cmd *cmd);
+t_env   *find_node(t_env *env, char *key);
 // PATH's function
 char	**get_paths(t_env *env);
 void	free_paths(char **paths);
@@ -127,6 +128,8 @@ void    free_cmds(t_cmd *cmds);
 void    expansion(t_shell *shell);
 // HEARDOC_PREPRARTION's functions
 void    heredoc_preparation(t_cmd *cmds);
+// BUILTIN's functions 
+int builtin_functions(t_shell *shell, t_token **tokens);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
