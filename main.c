@@ -63,13 +63,9 @@ int main(int argc, char **argv, char **envp)
 		}
 		expansion(&shell);
 		heredoc_preparation(shell.cmds);
-		if (builtin_functions(&shell, &tokens))
-		{
-			printf("There is something wrong in builtin functions\n");
-			continue;
-		}
-		//print_tokens(tokens);
-		//print_cmds(shell.cmds);
+		builtin_functions(&shell, &tokens);
+		print_tokens(tokens);
+		print_cmds(shell.cmds);
 		free_cmds(shell.cmds);
 		free_tokens(tokens);
 		free(line);

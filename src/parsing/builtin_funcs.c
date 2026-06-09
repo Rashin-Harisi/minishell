@@ -19,11 +19,12 @@ int is_valid_arg(char *str)
 
 int pwd_func(t_shell *shell)
 {
-    char    *value;
+    (void)shell;
+    char    pwd[PATH_MAX];
 
-    value = get_env_value(shell->env,"PWD");
-    if (!value)return (1);
-    printf("%s\n", value);
+    if (!getcwd(pwd, sizeof(pwd)))
+        return (perror("getcwd"),1);
+    printf("%s\n", pwd);
     return (0);
 }
 
@@ -84,19 +85,26 @@ int exit_func(t_shell *shell, t_token *tokens)
     exit(ft_atoi(shell->cmds->args[1]));
 }
 
-int builtin_functions(t_shell *shell, t_token **tokens)
+void builtin_functions(t_shell *shell, t_token **tokens)
 {
-    if (!shell || !shell->cmds->args || !shell->cmds->args[0]) return (1);
+    if (!shell || !shell->cmds->args || !shell->cmds->args[0]) return;
     if (builtin_update_env(shell, shell->cmds))
     {
 		printf("There is something wrong in updating env\n");
-        return (1);
     }
     if (ft_strncmp(shell->cmds->args[0], "pwd", ft_strlen("pwd") + 1) == 0)
-        return (pwd_func(shell));
+    {
+        if (pwd_func(shell))
+            printf("minishell : pwd: error\n");
+    }
     if (ft_strncmp(shell->cmds->args[0], "echo", ft_strlen("echo") + 1) == 0)
-        return (echo_func(shell));
+    {
+        if(echo_func(shell))
+            printf("minishell : echo: error\n");
+    }
     if (ft_strncmp(shell->cmds->args[0], "exit", ft_strlen("exit") + 1) == 0)
-        return (exit_func(shell, *tokens));
-    return (0);
+    {
+        if(exit_func(shell, *tokens))
+            printf("minishell : exit : error\n");
+    }
 }

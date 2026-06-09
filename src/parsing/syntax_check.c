@@ -10,9 +10,11 @@ int pipe_validation(t_token *prev, t_token *curr)
     if (prev->type == TOKEN_APPEND || prev->type == TOKEN_HEREDOC
         || prev->type == TOKEN_REDIR_IN || prev->type == TOKEN_REDIR_OUT)
         return (0);
+    /*
     if (next->type == TOKEN_APPEND || next->type == TOKEN_HEREDOC
         || next->type == TOKEN_REDIR_IN || next->type == TOKEN_REDIR_OUT)
         return (0);
+    */
     return (1);
 }
 

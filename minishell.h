@@ -129,7 +129,7 @@ void    expansion(t_shell *shell);
 // HEARDOC_PREPRARTION's functions
 void    heredoc_preparation(t_cmd *cmds);
 // BUILTIN's functions 
-int builtin_functions(t_shell *shell, t_token **tokens);
+void builtin_functions(t_shell *shell, t_token **tokens);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
