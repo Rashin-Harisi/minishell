@@ -77,6 +77,28 @@ static void    free_array(char **arr)
     }
     free(arr);
 }
+//A word consisting solely of letters, numbers, and underscores, 
+//and beginning with a letter or underscore.
+int is_valid_name(char *str)
+{
+    int i;
+
+    i = 0;
+    if (!(str[0] == '_'
+        || (str[0] >= 'a' && str[0] <= 'z')
+        || (str[0] >= 'A' && str[0] <= 'Z')))
+        return (printf("minishell: export: not an identifier\n"), 0);
+    while (str[i])
+    {
+        if (!(str[0] == '_'
+            || (str[0] >= 'a' && str[0] <= 'z')
+            || (str[0] >= 'A' && str[0] <= 'Z')
+            || (str[0] >= '0' && str[0] <= '9')))
+            return (printf("minishell: export: not an identifier\n"), 0);
+        i++;
+    }
+    return (1);
+}
 
 int export_env_func(char **args, t_shell *shell)
 {
@@ -92,7 +114,7 @@ int export_env_func(char **args, t_shell *shell)
         while(args[i])
         {
             split = ft_split(args[i], '=');
-            if (!split || !split[0])
+            if (!split || !split[0] || !is_valid_name(split[0]))
                 return (shell->exit_status = 1, 1);
             if (!split[1]) 
                 value = "";
