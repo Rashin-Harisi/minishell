@@ -193,17 +193,28 @@ int env_func(t_shell *shell)
     return (0);
 }
 
-int builtin_update_env(t_shell *shell, t_cmd *cmd)
+void builtin_update_env(t_shell *shell, t_cmd *cmd)
 {    
     if(!cmd || !cmd->args || !cmd->args[0])
-        return (1);
+        return ;
     if (ft_strncmp(cmd->args[0], "cd", ft_strlen("cd") + 1) == 0)
-        return (cd_env_func(cmd->args, shell));
+    {
+        if (cd_env_func(cmd->args, shell))
+            printf("minishell : cd : error\n");
+    }
     if (ft_strncmp(cmd->args[0], "export", ft_strlen("export") + 1) == 0)
-        return (export_env_func(cmd->args, shell));
+    {
+        if (export_env_func(cmd->args, shell))
+            printf("minishell : export : error\n");
+    }
     if (ft_strncmp(cmd->args[0], "unset", ft_strlen("unset") + 1 ) == 0)
-        return (unset_env_func(cmd->args, shell));
+    {
+        if (unset_env_func(cmd->args, shell))
+            printf("minishell : unset : error\n");
+    }
     if (ft_strncmp(cmd->args[0], "env", ft_strlen("env") + 1) == 0)
-        return (env_func(shell));
-    return (0);
+    {
+        if(env_func(shell))
+            printf("minishell : env: error\n)");
+    }
 }

@@ -97,14 +97,14 @@ typedef struct s_cmd
 
 /*=================functions====================*/
 // ENV's functions
-int    extract_key_value(char *str,char **key, char **value);
+int     extract_key_value(char *str,char **key, char **value);
 void	ft_lstadd_back_env(t_env **env, t_env *new);
 void    free_envs(t_env *env);
 t_env   *init_env(char **envp);
 t_env   *create_minimal_envp(void);
 char    *get_env_value(t_env *env, char *key);
-t_env    *create_env_node(char *key, char *value);
-int builtin_update_env(t_shell *shell, t_cmd *cmd);
+t_env   *create_env_node(char *key, char *value);
+void    builtin_update_env(t_shell *shell, t_cmd *cmd);
 t_env   *find_node(t_env *env, char *key);
 // PATH's function
 char	**get_paths(t_env *env);
@@ -116,10 +116,10 @@ void    init_signals(void);
 // TOKENS' functions
 void    free_tokens(t_token *tokens);
 void	ft_lstadd_back_token(t_token **token, t_token *new);
-t_token    *init_token(char *tmp, t_token *node);
+t_token *init_token(char *tmp, t_token *node);
 char    *each_part_extract(char *line, int *index, int *syntax_error);
 void    skip_spaces(char *line, int *index);
-t_token    *create_tokens(char *line);
+t_token *create_tokens(char *line);
 // SYNTAX_CHECK's functions
 int syntax_check(t_token *tokens);
 // CMDS' functions
@@ -134,7 +134,7 @@ void builtin_functions(t_shell *shell, t_token **tokens);
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
 void	print_paths(char **paths);
-int	is_empty_line(char *line);
+int	    is_empty_line(char *line);
 void	print_cmds(t_cmd *cmds);
 
 #endif

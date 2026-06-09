@@ -88,10 +88,7 @@ int exit_func(t_shell *shell, t_token *tokens)
 void builtin_functions(t_shell *shell, t_token **tokens)
 {
     if (!shell || !shell->cmds->args || !shell->cmds->args[0]) return;
-    if (builtin_update_env(shell, shell->cmds))
-    {
-		printf("There is something wrong in updating env\n");
-    }
+    builtin_update_env(shell, shell->cmds);
     if (ft_strncmp(shell->cmds->args[0], "pwd", ft_strlen("pwd") + 1) == 0)
     {
         if (pwd_func(shell))
