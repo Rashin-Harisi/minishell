@@ -39,9 +39,18 @@ int syntax_check(t_token *tokens)
     curr = tokens;
     while(curr)
     {
+        int len = ft_strlen(curr->value);
+        if (ft_strncmp(curr->value, ";" , 2) == 0 || curr->value[len -1] == ';')
+            return (1);
+        if (ft_strncmp(curr->value, "&" , 2) == 0 || curr->value[len -1] == '&')
+            return (1);
+        if (ft_strncmp(curr->value, "`" , 2) == 0 || curr->value[len -1] == '`')
+            return (1);
         if (curr->type == TOKEN_PIPE && !pipe_validation(prev, curr))
             return (1);
-        
+        if ((curr->value[0] == '(' && curr->value[len - 1] == ')')
+            || (curr->value[0] == '(' || curr->value[len - 1] == ')'))
+            return (1);
         if ((curr->type == TOKEN_APPEND || curr->type == TOKEN_HEREDOC
             || curr->type == TOKEN_REDIR_IN || curr->type == TOKEN_REDIR_OUT)
             && !redir_validation(curr))

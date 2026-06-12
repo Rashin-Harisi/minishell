@@ -79,7 +79,7 @@ static void    free_array(char **arr)
 }
 //A word consisting solely of letters, numbers, and underscores, 
 //and beginning with a letter or underscore.
-int is_valid_name(char *str)
+int is_valid_name(char *str, char *func)
 {
     int i;
 
@@ -87,14 +87,14 @@ int is_valid_name(char *str)
     if (!(str[0] == '_'
         || (str[0] >= 'a' && str[0] <= 'z')
         || (str[0] >= 'A' && str[0] <= 'Z')))
-        return (printf("minishell: export: not an identifier\n"), 0);
+        return (printf("minishell: %s : not an identifier\n", func), 0);
     while (str[i])
     {
-        if (!(str[0] == '_'
-            || (str[0] >= 'a' && str[0] <= 'z')
-            || (str[0] >= 'A' && str[0] <= 'Z')
-            || (str[0] >= '0' && str[0] <= '9')))
-            return (printf("minishell: export: not an identifier\n"), 0);
+        if (!(str[i] == '_'
+            || (str[i] >= 'a' && str[i] <= 'z')
+            || (str[i] >= 'A' && str[i] <= 'Z')
+            || (str[i] >= '0' && str[i] <= '9')))
+            return (printf("minishell: %s : not an identifier\n", func), 0);
         i++;
     }
     return (1);
@@ -105,6 +105,7 @@ int export_env_func(char **args, t_shell *shell)
     char    **split; // split[0] = key, split[1] = value
     t_env   *node;
     char    *value;
+    int status= 0;
     int i = 1;
 
     if (!args[1])
@@ -113,9 +114,28 @@ int export_env_func(char **args, t_shell *shell)
     {
         while(args[i])
         {
+            if (args[i][0] == '=')
+            {
+                status = 1;
+                i++;
+                printf("minishell: export: not a valid identifier\n");
+                continue;
+            }
             split = ft_split(args[i], '=');
-            if (!split || !split[0] || !is_valid_name(split[0]))
-                return (shell->exit_status = 1, 1);
+            if (!split || !split[0])
+            {
+                status = 1;
+                i++;
+                if (split) free_array(split);
+                continue;
+            }
+            if (!is_valid_name(split[0], "export"))
+            {
+                status = 1;
+                i++;
+                free_array(split);
+                continue;
+            }
             if (!split[1]) 
                 value = "";
             else
@@ -139,8 +159,8 @@ int export_env_func(char **args, t_shell *shell)
             i++;
         }
     }
-    shell->exit_status = 0;
-    return (0);
+    shell->exit_status = status;
+    return (status);
 }
 
 void    remove_env_node(t_env **env, t_env *node)
@@ -174,16 +194,23 @@ int unset_env_func(char **args, t_shell *shell)
 {
     int i = 1;
     t_env   *node;
+    int status = 0;
 
     while (args[i])
     {
+        if (!is_valid_name(args[i], "unset"))
+        {
+            status = 1;
+            i++;
+            continue;
+        }
         node = find_node(shell->env, args[i]);
         if (node)
             remove_env_node(&shell->env, node);
         i++;
     }
-    shell->exit_status = 0;
-    return (0);
+    shell->exit_status = status;
+    return (status);
 }
 
 int env_func(t_shell *shell)

@@ -55,6 +55,7 @@ int echo_func(t_shell *shell)
 
 int exit_func(t_shell *shell, t_token *tokens)
 {
+    int code = 0;
     if (shell->cmds->args[0] && !shell->cmds->args[1])
     {
         free_cmds(shell->cmds);
@@ -65,7 +66,7 @@ int exit_func(t_shell *shell, t_token *tokens)
     }
     if (!is_valid_arg(shell->cmds->args[1]))
     {
-        printf("minishell: ecit: not valid arguments.\n");
+        printf("minishell: exit: numeric argument required.\n");
         printf("exit\n");
         free_cmds(shell->cmds);
         free_envs(shell->env);
@@ -79,10 +80,11 @@ int exit_func(t_shell *shell, t_token *tokens)
         return (1);
     }
     printf("exit\n");
+    code = ft_atoi(shell->cmds->args[1]);
     free_cmds(shell->cmds);
     free_envs(shell->env);
     free_tokens(tokens);
-    exit(ft_atoi(shell->cmds->args[1]));
+    exit(code);
 }
 
 void builtin_functions(t_shell *shell, t_token **tokens)

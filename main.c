@@ -40,14 +40,16 @@ int main(int argc, char **argv, char **envp)
 		tokens = create_tokens(line);
 		if (!tokens && !is_empty_line(line))
 		{
-			printf("Syntax error\n");
+			printf("Syntax error quotation\n");
+			shell.exit_status = 1;
 			free(line);
 		    rl_on_new_line();
 			continue;
 		}
 		if ( syntax_check(tokens))
 		{
-			printf("Syntax error\n");
+			printf("Syntax error pipe, redirection, semicolon, ampersand, or parenthesis\n");
+			shell.exit_status = 1;
 			free_tokens(tokens);
 			free(line);
 		    rl_on_new_line();
