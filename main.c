@@ -1,32 +1,32 @@
 #include "minishell.h"
 
-
 int main(int argc, char **argv, char **envp)
 {
-    t_shell shell;
-	char	*line;
-	char	*prompt;
-	t_token	*tokens;
-	char	**paths;
-
+	t_shell shell;
+	char *line;
+	char *prompt;
+	t_token *tokens;
+	char **paths;
+	char *msg;
 
 	(void)argv;
-	if (argc != 1) return (1);
+	if (argc != 1)
+		return (1);
 	ft_memset(&shell, 0, sizeof(t_shell));
 	if (envp[0] == NULL)
 		shell.env = create_minimal_envp();
-    else
+	else
 		shell.env = init_env(envp);
 	paths = get_paths(shell.env);
-	//print_envs(shell.env);
-	//print_paths(paths);
+	// print_envs(shell.env);
+	// print_paths(paths);
 	while (1)
 	{
 		init_signals();
 		prompt = create_prompt(&shell);
 		line = readline(prompt);
 		free(prompt);
-		if (!line) 
+		if (!line)
 		{
 			printf("exit\n");
 			break;
@@ -36,23 +36,24 @@ int main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
-		if (*line) add_history(line);
+		if (*line)
+			add_history(line);
 		tokens = create_tokens(line);
 		if (!tokens && !is_empty_line(line))
 		{
 			printf("Syntax error quotation\n");
 			shell.exit_status = 1;
 			free(line);
-		    rl_on_new_line();
+			rl_on_new_line();
 			continue;
 		}
-		if ( syntax_check(tokens))
+		if (syntax_check(tokens))
 		{
 			printf("Syntax error pipe, redirection, semicolon, ampersand, or parenthesis\n");
 			shell.exit_status = 1;
 			free_tokens(tokens);
 			free(line);
-		    rl_on_new_line();
+			rl_on_new_line();
 			continue;
 		}
 		shell.cmds = create_cmds(tokens);
@@ -66,13 +67,24 @@ int main(int argc, char **argv, char **envp)
 		expansion(&shell);
 		heredoc_preparation(shell.cmds);
 		builtin_functions(&shell, &tokens);
-		print_tokens(tokens);
-		print_cmds(shell.cmds);
+		if (!execution(&shell, &tokens, paths, msg))
+		{
+			printf("minishell: exec: %s\n", msg);
+			shell.exit_status = 1;
+			free_tokens(tokens);
+			free_cmds(shell.cmds);
+			free(line);
+			free_paths(paths);
+			free_envs(shell.env);
+			return (shell.exit_status);
+		}
+		// print_tokens(tokens);
+		// print_cmds(shell.cmds);
 		free_cmds(shell.cmds);
 		free_tokens(tokens);
 		free(line);
 	}
 	free_paths(paths);
 	free_envs(shell.env);
-    return (0);
+	return (0);
 }

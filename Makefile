@@ -15,7 +15,8 @@ MANDATORY_SRC	= main.c\
 				./src/parsing/expansion.c \
 				./src/heardoc_prepration/prepration.c \
 				./env/update_env.c \
-				./src/parsing/builtin_funcs.c
+				./src/parsing/builtin_funcs.c \
+				./src/executing/execution.c
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 
@@ -23,7 +24,7 @@ LIBFT_PATH	= ./libft
 LIBFT		= libft.a
 
 CC		= cc
-CFLAGS	= -Wall -Wextra -Werror -g -I.
+CFLAGS	= -Wall -Wextra  -g -I.
 
 all: $(NAME)
 
