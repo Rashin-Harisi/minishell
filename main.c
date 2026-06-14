@@ -67,16 +67,19 @@ int main(int argc, char **argv, char **envp)
 		expansion(&shell);
 		heredoc_preparation(shell.cmds);
 		builtin_functions(&shell, &tokens);
-		if (!execution(&shell, &tokens, paths, msg))
+		msg = NULL;
+		if (execution(&shell, &tokens, paths, &msg))
 		{
-			printf("minishell: exec: %s\n", msg);
+			if (msg)
+			{
+				printf("minishell: exec: %s\n", msg);
+				free(msg);
+			}
 			shell.exit_status = 1;
 			free_tokens(tokens);
 			free_cmds(shell.cmds);
 			free(line);
-			free_paths(paths);
-			free_envs(shell.env);
-			return (shell.exit_status);
+			continue;
 		}
 		// print_tokens(tokens);
 		// print_cmds(shell.cmds);

@@ -138,6 +138,6 @@ int	    is_empty_line(char *line);
 void	print_cmds(t_cmd *cmds);
 
 //EXECUTION's functions
-int execution(t_shell *shell, t_token **tokens, char **paths, char *msg);
+int execution(t_shell *shell, t_token **tokens, char **paths, char **msg);
 
 #endif
