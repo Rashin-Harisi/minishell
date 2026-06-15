@@ -24,7 +24,7 @@ LIBFT_PATH	= ./libft
 LIBFT		= libft.a
 
 CC		= cc
-CFLAGS	= -Wall -Wextra  -g -I.
+CFLAGS	= -Wall -Wextra -Werror -g -I.
 
 all: $(NAME)
 

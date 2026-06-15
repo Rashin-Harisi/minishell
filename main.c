@@ -7,7 +7,6 @@ int main(int argc, char **argv, char **envp)
 	char *prompt;
 	t_token *tokens;
 	char **paths;
-	char *msg;
 
 	(void)argv;
 	if (argc != 1)
@@ -18,8 +17,8 @@ int main(int argc, char **argv, char **envp)
 	else
 		shell.env = init_env(envp);
 	paths = get_paths(shell.env);
-	// print_envs(shell.env);
-	// print_paths(paths);
+	//print_envs(shell.env);
+	//print_paths(paths);
 	while (1)
 	{
 		init_signals();
@@ -66,23 +65,16 @@ int main(int argc, char **argv, char **envp)
 		}
 		expansion(&shell);
 		heredoc_preparation(shell.cmds);
-		builtin_functions(&shell, &tokens);
-		msg = NULL;
-		if (execution(&shell, &tokens, paths, &msg))
+		if (execution(&shell, &tokens, paths))
 		{
-			if (msg)
-			{
-				printf("minishell: exec: %s\n", msg);
-				free(msg);
-			}
 			shell.exit_status = 1;
 			free_tokens(tokens);
 			free_cmds(shell.cmds);
 			free(line);
 			continue;
 		}
-		// print_tokens(tokens);
-		// print_cmds(shell.cmds);
+		//print_tokens(tokens);
+		//print_cmds(shell.cmds);
 		free_cmds(shell.cmds);
 		free_tokens(tokens);
 		free(line);

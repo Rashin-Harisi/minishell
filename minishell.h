@@ -136,8 +136,8 @@ void	print_tokens(t_token *tokens);
 void	print_paths(char **paths);
 int	    is_empty_line(char *line);
 void	print_cmds(t_cmd *cmds);
-
+void    free_array(char **args);
 //EXECUTION's functions
-int execution(t_shell *shell, t_token **tokens, char **paths, char **msg);
+int execution(t_shell *shell, t_token **tokens, char **paths);
 
 #endif
