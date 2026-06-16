@@ -10,6 +10,7 @@ t_env    *create_env_node(char *key, char *value)
     node->key = ft_strdup(key);
     node->value = ft_strdup(value);
     node->next = NULL;
+    node->has_equal = 1;
     if (!node->key || !node->value)
     {
         free(node->key);

@@ -14,8 +14,8 @@ MANDATORY_SRC	= main.c\
 				./src/parsing/cmds.c \
 				./src/parsing/expansion.c \
 				./src/heardoc_prepration/prepration.c \
-				./env/update_env.c \
-				./src/parsing/builtin_funcs.c \
+				./src/builtins/update_env.c \
+				./src/builtins/builtin_funcs.c \
 				./src/executing/execution.c \
 				./src/executing/access.c \
 				./src/executing/pipeline_command.c \

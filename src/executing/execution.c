@@ -7,6 +7,6 @@ int execution(t_shell *shell, t_token **tokens, char **paths)
     if (count_node(shell->cmds) == 1)
         execute_single_command(shell, paths, tokens);
     else
-        execute_pipeline(shell->cmds);
+        execute_pipeline(shell, paths, tokens);
     return (0);
 }

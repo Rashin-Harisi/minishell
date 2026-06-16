@@ -97,6 +97,17 @@ int is_valid_name(char *str, char *func)
     }
     return (1);
 }
+void    print_export(t_env *env)
+{
+    while(env)
+    {
+        if (env->has_equal)
+            printf("declare -x %s=\"%s\"\n", env->key, env->value);
+        else
+            printf("declare -x %s\n", env->key);
+        env = env->next;
+    }
+}
 
 int export_env_func(char **args, t_shell *shell)
 {
@@ -105,9 +116,11 @@ int export_env_func(char **args, t_shell *shell)
     char *value;
     int status = 0;
     int i = 1;
-
+    int has_equal;
+    
+    has_equal = 0;
     if (!args[1])
-        return (print_envs(shell->env), shell->exit_status = 0, 0);
+        return (print_export(shell->env), shell->exit_status = 0, 0);
     else
     {
         while (args[i])
@@ -119,6 +132,7 @@ int export_env_func(char **args, t_shell *shell)
                 printf("minishell: export: not a valid identifier\n");
                 continue;
             }
+            has_equal = (ft_strchr(args[i], '=') != NULL);
             split = ft_split(args[i], '=');
             if (!split || !split[0])
             {
@@ -142,16 +156,21 @@ int export_env_func(char **args, t_shell *shell)
             node = find_node(shell->env, split[0]);
             if (node)
             {
-                free(node->value);
-                node->value = ft_strdup(value);
-                if (!node->value)
-                    return (free_array(split), shell->exit_status = 1, 1);
+                if (has_equal)
+                {
+                    free(node->value);
+                    node->value = ft_strdup(value);
+                    if (!node->value)
+                        return (free_array(split), shell->exit_status = 1, 1);
+                    node->has_equal = 1;
+                }
             }
             else
             {
                 node = create_env_node(split[0], value);
                 if (!node)
                     return (free_array(split), shell->exit_status = 1, 1);
+                node->has_equal = has_equal;
                 ft_lstadd_back_env(&shell->env, node);
             }
             free_array(split);
@@ -219,7 +238,7 @@ int env_func(t_shell *shell)
     tmp = shell->env;
     while (tmp)
     {
-        if (tmp->value)
+        if (tmp->has_equal)
             printf("%s=%s\n", tmp->key, tmp->value);
         tmp = tmp->next;
     }

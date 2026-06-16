@@ -28,35 +28,36 @@ int pwd_func(t_shell *shell)
     return (0);
 }
 
-int echo_func(t_shell *shell)
+int echo_func(t_shell *shell, t_cmd *cmd)
 {
     int i;
     int n_flag;
 
     i = 1;
+    (void)shell;
     n_flag = 0;
-    if (shell->cmds->args[i]
-        && ft_strncmp(shell->cmds->args[i], "-n", 3) == 0) 
+    if (cmd->args[i]
+        && ft_strncmp(cmd->args[i], "-n", 3) == 0) 
     {
         n_flag = 1;
         i++;
     }
-    while (shell->cmds->args[i])
+    while (cmd->args[i])
     {
-        printf("%s\n", shell->cmds->args[i]);
-        if (shell->cmds->args[i + 1])
+        printf("%s", cmd->args[i]);
+        if (cmd->args[i + 1])
             printf(" ");
         i++;
     }
-    if (n_flag)
+    if (!n_flag)
         printf("\n");
     return (0);
 }
 
-int exit_func(t_shell *shell, t_token *tokens)
+int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd)
 {
     int code = 0;
-    if (shell->cmds->args[0] && !shell->cmds->args[1])
+    if (cmd->args[0] && !cmd->args[1])
     {
         free_cmds(shell->cmds);
         free_envs(shell->env);
@@ -64,7 +65,7 @@ int exit_func(t_shell *shell, t_token *tokens)
         printf("exit\n");
         exit(shell->exit_status);
     }
-    if (!is_valid_arg(shell->cmds->args[1]))
+    if (!is_valid_arg(cmd->args[1]))
     {
         printf("minishell: exit: numeric argument required.\n");
         printf("exit\n");
@@ -73,14 +74,14 @@ int exit_func(t_shell *shell, t_token *tokens)
         free_tokens(tokens);
         exit(2);
     }
-    if (shell->cmds->args[2])
+    if (cmd->args[2])
     {
         printf("minishell: exit: too many arguments\n");
         shell->exit_status = 1;
         return (1);
     }
     printf("exit\n");
-    code = ft_atoi(shell->cmds->args[1]);
+    code = ft_atoi(cmd->args[1]);
     free_cmds(shell->cmds);
     free_envs(shell->env);
     free_tokens(tokens);
@@ -98,12 +99,12 @@ void builtin_functions(t_shell *shell, t_token **tokens)
     }
     if (ft_strncmp(shell->cmds->args[0], "echo", ft_strlen("echo") + 1) == 0)
     {
-        if(echo_func(shell))
+        if(echo_func(shell, shell->cmds))
             printf("minishell : echo: error\n");
     }
     if (ft_strncmp(shell->cmds->args[0], "exit", ft_strlen("exit") + 1) == 0)
     {
-        if(exit_func(shell, *tokens))
+        if(exit_func(shell, *tokens, shell->cmds))
             printf("minishell : exit : error\n");
     }
 }

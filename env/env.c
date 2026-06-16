@@ -81,6 +81,7 @@ t_env   *init_env(char **envp)
             free_envs(env);
             return (NULL);
         }
+        node->has_equal = 1;
         node->next = NULL;
         ft_lstadd_back_env(&env, node);
         i++;

@@ -2,19 +2,15 @@
 
 void	print_envs(t_env *env)
 {
-	printf("========== ENV ==========\n");
-	while (env)
-	{
-		printf("KEY   : %s\n",
-			env->key ? env->key : "(null)");
+	t_env *tmp;
 
-		printf("VALUE : %s\n",
-			env->value ? env->value : "(null)");
-
-		printf("-------------------------\n");
-
-		env = env->next;
-	}
+    tmp = env;
+    while (tmp)
+    {
+        if (tmp->has_equal)
+            printf("%s=%s\n", tmp->key, tmp->value);
+        tmp = tmp->next;
+    }
 }
 
 char	*get_token_type_name(t_token_type type)
