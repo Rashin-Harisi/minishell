@@ -139,5 +139,16 @@ void	print_cmds(t_cmd *cmds);
 void    free_array(char **args);
 //EXECUTION's functions
 int execution(t_shell *shell, t_token **tokens, char **paths);
+int check_redirection(t_cmd *cmds);
+int apply_redirection(t_redir *redirects);
+int count_node(t_cmd *cmds);
+int is_builtin(char **args);
+int calculate_nodes(t_env *env);
+char    **convert_list_to_array(t_env *env);
+char *check_access_pathname(char **paths, char *cmd, t_shell *shell);
+void execute_external_command(t_cmd *cmd, char **paths, t_shell *shell);
+void    builtin_with_redirection(t_shell *shell, t_token **tokens);
+void execute_single_command(t_shell *shell, char **paths, t_token **tokens);
+void execute_pipeline(t_cmd *cmds);
 
 #endif
