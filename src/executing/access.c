@@ -26,6 +26,8 @@ char *check_access_pathname(char **paths, char *cmd, t_shell *shell)
         i++;
     }
     shell->exit_status = 127;
-    printf("minishell: %s: command not found\n", cmd);
+    ft_putstr_fd("minishell: ",2);
+    ft_putstr_fd(cmd ,2);
+    ft_putstr_fd(": command not found\n",2);
     return (NULL);
 }

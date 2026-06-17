@@ -70,6 +70,7 @@ typedef struct s_env
 {
     char            *key;
     char            *value;
+    int             has_equal;
     struct s_env    *next;
 } t_env; //linked list for each key-value pair of env list
 
@@ -130,6 +131,9 @@ void    expansion(t_shell *shell);
 void    heredoc_preparation(t_cmd *cmds);
 // BUILTIN's functions 
 void builtin_functions(t_shell *shell, t_token **tokens);
+int pwd_func(t_shell *shell);
+int echo_func(t_shell *shell, t_cmd *cmd);
+int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd);
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
@@ -149,6 +153,6 @@ char *check_access_pathname(char **paths, char *cmd, t_shell *shell);
 void execute_external_command(t_cmd *cmd, char **paths, t_shell *shell);
 void    builtin_with_redirection(t_shell *shell, t_token **tokens);
 void execute_single_command(t_shell *shell, char **paths, t_token **tokens);
-void execute_pipeline(t_cmd *cmds);
+void execute_pipeline(t_shell *shell, char **paths, t_token **tokens);
 
 #endif
