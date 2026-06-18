@@ -69,6 +69,8 @@ void    builtin_with_redirection(t_shell *shell, t_token **tokens)
         {
             perror("dup2");
             shell->exit_status = 1;
+            close(saved_stdin);
+            close(saved_stdout);
             return;
         }
         close(saved_stdin);

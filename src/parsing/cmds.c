@@ -21,8 +21,9 @@ void    free_redirects(t_redir *redir)
     while(redir)
     {
         cur = redir-> next;
-        if (redir->filename)
-            free(redir->filename);
+        if (redir->fd != -1)
+            close(redir->fd);
+        free(redir->filename);
         free(redir);
         redir = cur;
     }
@@ -87,6 +88,8 @@ t_redir *init_redirect(t_token *tokens)
 {
     t_redir *tmp;
 
+    if (!tokens || !tokens->next || !tokens->next->value)
+        return (NULL);
     tmp = malloc(sizeof(t_redir));
     if (!tmp) return (NULL);
     tmp->fd = -1;
@@ -135,12 +138,14 @@ t_cmd *init_cmds(t_token **tokens)
     t_redir *node;
     int count;
 
+    if(!tokens || !*tokens) return (NULL);
     i = 0;
-    count = 0;
+    count = count_args(*tokens);
     cmd = malloc(sizeof(t_cmd));
     if (!cmd) return (NULL);
     cmd->redirects = NULL;
-    count = count_args(*tokens);
+    cmd->args = NULL;
+    cmd->next = NULL;
     cmd->args = ft_calloc((count + 1), sizeof(char *));
     if(!cmd->args) return (free(cmd),NULL);
     while(*tokens && (*tokens)->type != TOKEN_PIPE)
@@ -166,8 +171,7 @@ t_cmd *init_cmds(t_token **tokens)
         }
         (*tokens) = (*tokens)->next;
     }
-    cmd->args[count] = NULL;
-    cmd->next = NULL;
+    cmd->args[i] = NULL;
     return (cmd);
 }
 

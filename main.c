@@ -1,5 +1,12 @@
 #include "minishell.h"
 
+static void free_iteration(t_token *tokens, t_cmd *cmds, char *line)
+{
+	if (cmds) free_cmds(cmds);
+	if (tokens) free_tokens(tokens);
+	if (line) free(line);
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	t_shell shell;
@@ -16,11 +23,13 @@ int main(int argc, char **argv, char **envp)
 		shell.env = create_minimal_envp();
 	else
 		shell.env = init_env(envp);
-	paths = get_paths(shell.env);
+	paths = NULL;
 	//print_envs(shell.env);
 	//print_paths(paths);
 	while (1)
 	{
+		tokens = NULL;
+		shell.cmds = NULL;
 		init_signals();
 		prompt = create_prompt(&shell);
 		line = readline(prompt);
@@ -35,23 +44,22 @@ int main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
-		if (*line)
-			add_history(line);
+		add_history(line);
 		tokens = create_tokens(line);
-		if (!tokens && !is_empty_line(line))
+		if (!tokens)
 		{
 			printf("Syntax error quotation\n");
 			shell.exit_status = 1;
-			free(line);
+			free_iteration(tokens, shell.cmds, line);
 			rl_on_new_line();
 			continue;
 		}
+		//print_tokens(tokens);
 		if (syntax_check(tokens))
 		{
 			printf("Syntax error pipe, redirection, semicolon, ampersand, or parenthesis\n");
 			shell.exit_status = 1;
-			free_tokens(tokens);
-			free(line);
+			free_iteration(tokens, shell.cmds, line);
 			rl_on_new_line();
 			continue;
 		}
@@ -59,27 +67,25 @@ int main(int argc, char **argv, char **envp)
 		if (!shell.cmds)
 		{
 			printf("cmds creation fail\n");
-			free_tokens(tokens);
-			free(line);
+			shell.exit_status = 1;
+			free_iteration(tokens, shell.cmds, line);
 			continue;
 		}
-		expansion(&shell);
-		heredoc_preparation(shell.cmds);
-		if (execution(&shell, &tokens, paths))
+		if (expansion(&shell))
 		{
 			shell.exit_status = 1;
-			free_tokens(tokens);
-			free_cmds(shell.cmds);
-			free(line);
+			free_iteration(tokens, shell.cmds, line);
 			continue;
 		}
-		//print_tokens(tokens);
-		//print_cmds(shell.cmds);
-		free_cmds(shell.cmds);
-		free_tokens(tokens);
-		free(line);
+		heredoc_preparation(shell.cmds);
+		free_paths(paths);
+		paths = get_paths(shell.env);
+		if (execution(&shell, &tokens, paths))
+			shell.exit_status = 1;
+		free_iteration(tokens, shell.cmds, line);
 	}
 	free_paths(paths);
 	free_envs(shell.env);
-	return (0);
+	rl_clear_history();
+	return (shell.exit_status);
 }

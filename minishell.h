@@ -126,7 +126,7 @@ int syntax_check(t_token *tokens);
 // CMDS' functions
 t_cmd   *create_cmds(t_token *tokens);
 void    free_cmds(t_cmd *cmds);
-void    expansion(t_shell *shell);
+int    expansion(t_shell *shell);
 // HEARDOC_PREPRARTION's functions
 void    heredoc_preparation(t_cmd *cmds);
 // BUILTIN's functions 

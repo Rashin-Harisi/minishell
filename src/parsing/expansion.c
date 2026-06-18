@@ -25,7 +25,8 @@ char *find_var_value(char *var, t_env *envs)
 char    *append_str(char *str, char *s)
 {
     char    *new;
-    if (!s) s = "";
+    if (!s)
+        s = "";
     new = ft_strjoin(str, s);
     free(str);
     return(new);
@@ -52,7 +53,7 @@ char    *expand_var(char *str, int *i, t_shell *shell, char *expanded)
     {
         (*i)++;
         status = ft_itoa(shell->exit_status);
-        if (!status) return (NULL);
+        if (!status) return (free(expanded), NULL);
         expanded = append_str(expanded,status);
         free(status);
         return (expanded);
@@ -63,7 +64,7 @@ char    *expand_var(char *str, int *i, t_shell *shell, char *expanded)
     if (*i == start)
         return (append_char(expanded, '$'));
     var = ft_substr(str, start, (*i) - start);
-    if (!var) return (NULL);
+    if (!var) return (free(expanded),NULL);
     value = find_var_value(var, shell->env);
     free(var);
     if (value)
@@ -78,7 +79,7 @@ char    *expansion_string(char *str, t_shell *shell)
     int     double_quote;
     char    *expanded;
     
-
+    if (!str) return (NULL);
     i = 0;
     single_quote = 0;
     double_quote = 0;
@@ -111,45 +112,49 @@ char    *expansion_string(char *str, t_shell *shell)
     return (expanded);
 }
 
-void    expansion_args(char **args, t_shell *shell)
+int    expansion_args(char **args, t_shell *shell)
 {
     int i;
     char *expanded;
 
     i = 0;
-    while (args[i])
+    while (args && args[i])
     {
         expanded = expansion_string(args[i], shell);
-        if (!expanded) return;
+        if (!expanded) return(1);
         free(args[i]);
         args[i] = expanded;
         i++;
     }
+    return (0);
 }
 
-void    expansion_redir(t_redir *redir, t_shell *shell)
+int    expansion_redir(t_redir *redir, t_shell *shell)
 {
     char    *expanded;
     
     while (redir)
     {
         expanded = expansion_string(redir->filename, shell);
-        if (!expanded) return;
+        if (!expanded) return (1);
         free(redir->filename);
         redir->filename = expanded;
         redir = redir->next;
     }
+    return (0);
 }
 
-void    expansion(t_shell *shell)
+int    expansion(t_shell *shell)
 {
     t_cmd   *cmds;
 
+    if (!shell) return (1);
     cmds = shell->cmds;
     while (cmds)
     {
-        expansion_args(cmds->args, shell);
-        expansion_redir(cmds->redirects, shell);
+        if (expansion_args(cmds->args, shell)) return (1);
+        if (expansion_redir(cmds->redirects, shell)) return (1);
         cmds = cmds->next;
     }
+    return (0);
 }

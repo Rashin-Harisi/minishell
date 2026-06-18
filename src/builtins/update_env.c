@@ -15,19 +15,22 @@ int update_env_value(t_env **env, char *key, char *new_value)
 {
     t_env *node;
     t_env *new;
+    char *tmp;
 
     node = find_node(*env, key);
     if (node)
     {
+        tmp = ft_strdup(new_value);
+        if (!tmp) return (1);
         free(node->value);
-        node->value = ft_strdup(new_value);
-        if (!node->value)
-            return (1);
+        node->value = tmp;
+        node->has_equal = 1;
         return (0);
     }
     new = create_env_node(key, new_value);
     if (!new)
         return (1);
+    node->has_equal = 1;
     ft_lstadd_back_env(env, new);
     return (0);
 }
@@ -40,7 +43,7 @@ int cd_env_func(char **args, t_shell *shell)
 
     if (args[1] && args[2])
     {
-        printf("minishe: cd : there are too many arguments\n");
+        ft_putstr_fd("minishe: cd : there are too many arguments\n", 2);
         shell->exit_status = 1;
         return (1);
     }
@@ -50,7 +53,7 @@ int cd_env_func(char **args, t_shell *shell)
         path = args[1];
     if (!path)
     {
-        printf("minishell : cd : path is not defined!\n");
+        ft_putstr_fd("minishell : cd : HOME is not defined!\n", 2);
         shell->exit_status = 1;
         return (1);
     }
@@ -67,19 +70,6 @@ int cd_env_func(char **args, t_shell *shell)
     shell->exit_status = 0;
     return (0);
 }
-
-static void y(char **arr)
-{
-    int i = 0;
-    if (!arr)
-        return;
-    while (arr[i])
-    {
-        free(arr[i]);
-        i++;
-    }
-    free(arr);
-}
 // A word consisting solely of letters, numbers, and underscores,
 // and beginning with a letter or underscore.
 int is_valid_name(char *str, char *func)
@@ -87,12 +77,29 @@ int is_valid_name(char *str, char *func)
     int i;
 
     i = 0;
+    if (!str || !str[0])
+    {
+        ft_putstr_fd("minishell: ", 2);
+        ft_putstr_fd(func, 2);
+        ft_putstr_fd(": not a valid identifier\n", 2);
+        return (0);
+    }
     if (!(str[0] == '_' || (str[0] >= 'a' && str[0] <= 'z') || (str[0] >= 'A' && str[0] <= 'Z')))
-        return (printf("minishell: %s : not an identifier\n", func), 0);
+    {
+        ft_putstr_fd("minishell: ", 2);
+        ft_putstr_fd(func, 2);
+        ft_putstr_fd(": not a valid identifier\n", 2);
+        return (0);
+    }
     while (str[i])
     {
         if (!(str[i] == '_' || (str[i] >= 'a' && str[i] <= 'z') || (str[i] >= 'A' && str[i] <= 'Z') || (str[i] >= '0' && str[i] <= '9')))
-            return (printf("minishell: %s : not an identifier\n", func), 0);
+        {
+            ft_putstr_fd("minishell: ", 2);
+            ft_putstr_fd(func, 2);
+            ft_putstr_fd(": not a valid identifier\n", 2);
+            return (0);
+        }
         i++;
     }
     return (1);
@@ -109,11 +116,33 @@ void    print_export(t_env *env)
     }
 }
 
+static char *get_export_key(char *arg)
+{
+    char *equal;
+
+    equal = ft_strchr(arg, '=');
+    if (!equal)
+        return (ft_strdup(arg));
+    return (ft_substr(arg, 0, equal - arg));
+}
+
+static char *get_export_value(char *arg)
+{
+    char *equal;
+
+    equal = ft_strchr(arg, '=');
+    if (!equal)
+        return (ft_strdup(""));
+    return (ft_strdup(equal + 1));
+}
+
 int export_env_func(char **args, t_shell *shell)
 {
-    char **split; // split[0] = key, split[1] = value
+    //char **split; // split[0] = key, split[1] = value
     t_env *node;
     char *value;
+    char *key;
+    char *new_value;
     int status = 0;
     int i = 1;
     int has_equal;
@@ -125,55 +154,57 @@ int export_env_func(char **args, t_shell *shell)
     {
         while (args[i])
         {
-            if (args[i][0] == '=')
-            {
-                status = 1;
-                i++;
-                printf("minishell: export: not a valid identifier\n");
-                continue;
-            }
             has_equal = (ft_strchr(args[i], '=') != NULL);
-            split = ft_split(args[i], '=');
-            if (!split || !split[0])
+            key = get_export_key(args[i]);
+            value = get_export_value(args[i]);
+            if (!key || !value)
+            {
+                free(key);
+                free(value);
+                shell->exit_status = 1;
+                return (1);
+            }
+            if (!is_valid_name(key, "export"))
             {
                 status = 1;
+                free(key);
+                free(value);
                 i++;
-                if (split)
-                    y(split);
                 continue;
             }
-            if (!is_valid_name(split[0], "export"))
-            {
-                status = 1;
-                i++;
-                free_array(split);
-                continue;
-            }
-            if (!split[1])
-                value = "";
-            else
-                value = split[1];
-            node = find_node(shell->env, split[0]);
+            node = find_node(shell->env, key);
             if (node)
             {
                 if (has_equal)
                 {
+                    new_value = ft_strdup(value);
+                    if (!new_value)
+                    {
+                        free(key);
+                        free(value);
+                        shell->exit_status = 1;
+                        return (1);
+                    }
                     free(node->value);
-                    node->value = ft_strdup(value);
-                    if (!node->value)
-                        return (free_array(split), shell->exit_status = 1, 1);
+                    node->value = new_value;
                     node->has_equal = 1;
                 }
             }
             else
             {
-                node = create_env_node(split[0], value);
+                node = create_env_node(key, value);
                 if (!node)
-                    return (free_array(split), shell->exit_status = 1, 1);
+                {
+                    free(key);
+                    free(value);
+                    shell->exit_status = 1;
+                    return (1);
+                }
                 node->has_equal = has_equal;
                 ft_lstadd_back_env(&shell->env, node);
             }
-            free_array(split);
+            free(key);
+            free(value);
             i++;
         }
     }

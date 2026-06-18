@@ -24,11 +24,12 @@ char    *each_part_extract(char *line, int *index, int *syntax_error)
     int     len = 0;
     char    *tmp;
 
+    tmp = NULL;
     ft_memset(&flags, 0, sizeof(t_flags));
     skip_spaces(line, index);
     if (line[*index] == '\0') return NULL;
-    if ((line[*index] == '>' && line[*index + 1] == '>' && !flags.single_quote && !flags.double_quote)
-    || (line[*index] == '<' && line[*index + 1] == '<' && !flags.single_quote && !flags.double_quote))
+    if ((line[*index] == '>' && line[*index + 1] == '>')
+    || (line[*index] == '<' && line[*index + 1] == '<' ))
     {
         tmp = malloc(3 * sizeof(char));
         if (!tmp) return NULL;
@@ -38,9 +39,9 @@ char    *each_part_extract(char *line, int *index, int *syntax_error)
         (*index) += 2;
         return (tmp);
     }
-    if ((line[*index] == '>' && !flags.single_quote && !flags.double_quote)
-    || (line[*index] == '<' && !flags.single_quote && !flags.double_quote)
-    || (line[*index] == '|' && !flags.single_quote && !flags.double_quote))
+    if ((line[*index] == '>')
+    || (line[*index] == '<')
+    || (line[*index] == '|'))
     {
         tmp = malloc(2 * sizeof(char));
         if (!tmp) return NULL;
@@ -52,8 +53,10 @@ char    *each_part_extract(char *line, int *index, int *syntax_error)
     start = *index;
     while(line[*index] != '\0')
     {
-        if(line[*index] == '"' && !flags.single_quote) flags.double_quote = !flags.double_quote;
-        if(line[*index] == '\'' && !flags.double_quote) flags.single_quote = !flags.single_quote;
+        if(line[*index] == '"' && !flags.single_quote)
+            flags.double_quote = !flags.double_quote;
+        if(line[*index] == '\'' && !flags.double_quote)
+            flags.single_quote = !flags.single_quote;
         if(line[*index] == ' ' && (!flags.single_quote && !flags.double_quote))
         {
             len = (*index) - start;
@@ -125,8 +128,7 @@ void    free_tokens(t_token *tokens)
     while (tokens)
     {
         tmp = tokens->next;
-        if (tokens->value)
-            free(tokens->value);
+        free(tokens->value);
         free(tokens);
         tokens = tmp;
     }

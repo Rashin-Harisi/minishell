@@ -62,9 +62,15 @@ void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
         if (cmds->next && pipe(pipefd) == -1)
         {
             perror("pipe");
+            if (prev_fd != -1) close(prev_fd);
+            int j = 0;
+            while(j < i)
+            {
+                waitpid(pids[j], &status, 0);
+                j++;
+            }
             free_array(envp);
             free(pids);
-            if (prev_fd != -1) close(prev_fd);
             shell->exit_status = 1;
             return;
         }
@@ -132,7 +138,7 @@ void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
     while (i < count)
     {
         waitpid(pids[i], &status, 0);
-        if (i == count)
+        if (i == count -1 )
         {
             if (WIFEXITED(status))
                 shell->exit_status = WEXITSTATUS(status);
