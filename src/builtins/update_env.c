@@ -284,21 +284,21 @@ void builtin_update_env(t_shell *shell, t_cmd *cmd)
     if (ft_strncmp(cmd->args[0], "cd", ft_strlen("cd") + 1) == 0)
     {
         if (cd_env_func(cmd->args, shell))
-            printf("minishell : cd : error\n");
+            ft_putstrd_fd("minishell : cd : error\n", STDERR_FILENO);
     }
     if (ft_strncmp(cmd->args[0], "export", ft_strlen("export") + 1) == 0)
     {
         if (export_env_func(cmd->args, shell))
-            printf("minishell : export : error\n");
+            ft_putstr_fd("minishell : export : error\n", STDERR_FILENO);
     }
     if (ft_strncmp(cmd->args[0], "unset", ft_strlen("unset") + 1) == 0)
     {
         if (unset_env_func(cmd->args, shell))
-            printf("minishell : unset : error\n");
+            ft_putstr_fd("minishell : unset : error\n", STDERR_FILENO);
     }
     if (ft_strncmp(cmd->args[0], "env", ft_strlen("env") + 1) == 0)
     {
         if (env_func(shell))
-            printf("minishell : env: error\n)");
+            ft_putstr_fd("minishell : env: error\n", STDERR_FILENO);
     }
 }

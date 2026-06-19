@@ -24,7 +24,8 @@ int pwd_func(t_shell *shell)
 
     if (!getcwd(pwd, sizeof(pwd)))
         return (perror("getcwd"),1);
-    printf("%s\n", pwd);
+    ft_putstr_fd(pwd, STDERR_FILENO);
+    ft_putstr_fd("\n", STDERR_FILENO);
     return (0);
 }
 
@@ -62,13 +63,14 @@ int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd)
         free_cmds(shell->cmds);
         free_envs(shell->env);
         free_tokens(tokens);
-        printf("exit\n");
+        if (shell->interactive)
+            ft_putstr_fd("exit\n", STDERR_FILENO);
         exit(shell->exit_status);
     }
     if (!is_valid_arg(cmd->args[1]))
     {
-        printf("minishell: exit: numeric argument required.\n");
-        printf("exit\n");
+        ft_putstr_fd("minishell: exit: numeric argument required.\n", STDERR_FILENO);
+        if (shell->interactive) ft_putstr_fd("exit\n", STDERR_FILENO);
         free_cmds(shell->cmds);
         free_envs(shell->env);
         free_tokens(tokens);
@@ -76,11 +78,12 @@ int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd)
     }
     if (cmd->args[2])
     {
-        printf("minishell: exit: too many arguments\n");
+        ft_putstr_fd("minishell: exit: too many arguments\n", STDERR_FILENO);
         shell->exit_status = 1;
         return (1);
     }
-    printf("exit\n");
+    if (shell->interactive)
+        ft_putstr_fd("exit\n", STDERR_FILENO);
     code = ft_atoi(cmd->args[1]);
     free_cmds(shell->cmds);
     free_envs(shell->env);

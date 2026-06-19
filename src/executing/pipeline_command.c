@@ -25,17 +25,17 @@ void builtin_functions_in_pipe(t_shell *shell, t_token **tokens, t_cmd *cmd)
     if (ft_strncmp(cmd->args[0], "pwd", ft_strlen("pwd") + 1) == 0)
     {
         if (pwd_func(shell))
-            printf("minishell : pwd: error\n");
+            ft_putstr_fd("minishell : pwd: error\n", STDERR_FILENO);
     }
     if (ft_strncmp(cmd->args[0], "echo", ft_strlen("echo") + 1) == 0)
     {
         if(echo_func(shell, cmd))
-            printf("minishell : echo: error\n");
+            ft_putstr_fd("minishell : echo: error\n", STDERR_FILENO);
     }
     if (ft_strncmp(cmd->args[0], "exit", ft_strlen("exit") + 1) == 0)
     {
         if(exit_func(shell, *tokens, cmd))
-            printf("minishell : exit : error\n");
+            ft_putstr_fd("minishell : exit : error\n", STDERR_FILENO);
     }
 }
 void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)

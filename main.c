@@ -24,6 +24,7 @@ int main(int argc, char **argv, char **envp)
 	else
 		shell.env = init_env(envp);
 	paths = NULL;
+	shell.interactive = isatty(STDIN_FILENO);
 	//print_envs(shell.env);
 	//print_paths(paths);
 	while (1)
@@ -31,12 +32,23 @@ int main(int argc, char **argv, char **envp)
 		tokens = NULL;
 		shell.cmds = NULL;
 		init_signals();
-		prompt = create_prompt(&shell);
-		line = readline(prompt);
-		free(prompt);
+		if (shell.interactive)
+		{
+			prompt = create_prompt(&shell);
+			line = readline(prompt);
+			free(prompt);
+		}
+		else
+		{
+			line = get_next_line(STDIN_FILENO);
+			if (line && ft_strlen(line) > 0
+    			&& line[ft_strlen(line) - 1] == '\n')
+    			line[ft_strlen(line) - 1] = '\0';
+		}
 		if (!line)
 		{
-			printf("exit\n");
+			if (shell.interactive)
+				ft_putstr_fd("exit\n", STDERR_FILENO);
 			break;
 		}
 		if (is_empty_line(line))
@@ -44,11 +56,11 @@ int main(int argc, char **argv, char **envp)
 			free(line);
 			continue;
 		}
-		add_history(line);
+		if (shell.interactive) add_history(line);
 		tokens = create_tokens(line);
 		if (!tokens)
 		{
-			printf("Syntax error quotation\n");
+			ft_putstr_fd("Syntax error quotation\n", STDERR_FILENO);
 			shell.exit_status = 1;
 			free_iteration(tokens, shell.cmds, line);
 			rl_on_new_line();
@@ -57,7 +69,7 @@ int main(int argc, char **argv, char **envp)
 		//print_tokens(tokens);
 		if (syntax_check(tokens))
 		{
-			printf("Syntax error pipe, redirection, semicolon, ampersand, or parenthesis\n");
+			ft_putstr_fd("Syntax error pipe, redirection, semicolon, ampersand, or parenthesis\n", STDERR_FILENO);
 			shell.exit_status = 1;
 			free_iteration(tokens, shell.cmds, line);
 			rl_on_new_line();
@@ -66,7 +78,7 @@ int main(int argc, char **argv, char **envp)
 		shell.cmds = create_cmds(tokens);
 		if (!shell.cmds)
 		{
-			printf("cmds creation fail\n");
+			ft_putstr_fd("cmds creation fail\n", STDERR_FILENO);
 			shell.exit_status = 1;
 			free_iteration(tokens, shell.cmds, line);
 			continue;
@@ -86,6 +98,7 @@ int main(int argc, char **argv, char **envp)
 	}
 	free_paths(paths);
 	free_envs(shell.env);
+	//clear_history();
 	rl_clear_history();
 	return (shell.exit_status);
 }

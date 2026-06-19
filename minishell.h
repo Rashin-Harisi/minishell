@@ -96,6 +96,10 @@ typedef struct s_cmd
     struct s_cmd    *next;
 } t_cmd;
 
+#ifndef BUFFER_SIZE
+# define BUFFER_SIZE 42
+#endif
+
 /*=================functions====================*/
 // ENV's functions
 int     extract_key_value(char *str,char **key, char **value);
@@ -141,6 +145,7 @@ void	print_paths(char **paths);
 int	    is_empty_line(char *line);
 void	print_cmds(t_cmd *cmds);
 void    free_array(char **args);
+char *get_next_line(int fd);
 //EXECUTION's functions
 int execution(t_shell *shell, t_token **tokens, char **paths);
 int check_redirection(t_cmd *cmds);

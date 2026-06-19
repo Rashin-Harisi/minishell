@@ -21,7 +21,8 @@ MANDATORY_SRC	= main.c\
 				./src/executing/pipeline_command.c \
 				./src/executing/redirections.c \
 				./src/executing/single_command.c \
-				./src/executing/utils.c 
+				./src/executing/utils.c \
+				./utils/get_next_line.c
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 
