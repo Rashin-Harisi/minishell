@@ -284,7 +284,7 @@ void builtin_update_env(t_shell *shell, t_cmd *cmd)
     if (ft_strncmp(cmd->args[0], "cd", ft_strlen("cd") + 1) == 0)
     {
         if (cd_env_func(cmd->args, shell))
-            ft_putstrd_fd("minishell : cd : error\n", STDERR_FILENO);
+            ft_putstr_fd("minishell : cd : error\n", STDERR_FILENO);
     }
     if (ft_strncmp(cmd->args[0], "export", ft_strlen("export") + 1) == 0)
     {

@@ -24,8 +24,8 @@ int pwd_func(t_shell *shell)
 
     if (!getcwd(pwd, sizeof(pwd)))
         return (perror("getcwd"),1);
-    ft_putstr_fd(pwd, STDERR_FILENO);
-    ft_putstr_fd("\n", STDERR_FILENO);
+    ft_putstr_fd(pwd, STDOUT_FILENO);
+    ft_putstr_fd("\n", STDOUT_FILENO);
     return (0);
 }
 
@@ -69,7 +69,9 @@ int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd)
     }
     if (!is_valid_arg(cmd->args[1]))
     {
-        ft_putstr_fd("minishell: exit: numeric argument required.\n", STDERR_FILENO);
+        ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
+        ft_putstr_fd(cmd->args[1], STDERR_FILENO);
+        ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
         if (shell->interactive) ft_putstr_fd("exit\n", STDERR_FILENO);
         free_cmds(shell->cmds);
         free_envs(shell->env);
@@ -98,16 +100,16 @@ void builtin_functions(t_shell *shell, t_token **tokens)
     if (ft_strncmp(shell->cmds->args[0], "pwd", ft_strlen("pwd") + 1) == 0)
     {
         if (pwd_func(shell))
-            printf("minishell : pwd: error\n");
+            ft_putstr_fd("minishell : pwd: error\n", STDERR_FILENO);
     }
     if (ft_strncmp(shell->cmds->args[0], "echo", ft_strlen("echo") + 1) == 0)
     {
         if(echo_func(shell, shell->cmds))
-            printf("minishell : echo: error\n");
+            ft_putstr_fd("minishell : echo: error\n", STDERR_FILENO);
     }
     if (ft_strncmp(shell->cmds->args[0], "exit", ft_strlen("exit") + 1) == 0)
     {
         if(exit_func(shell, *tokens, shell->cmds))
-            printf("minishell : exit : error\n");
+            ft_putstr_fd("minishell : exit : error\n", STDERR_FILENO);
     }
 }
