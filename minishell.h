@@ -62,6 +62,8 @@ typedef struct s_shell
 {
     t_env   *env;
     t_cmd   *cmds;
+    char    *line;
+    int     in_pipe;
     int     exit_status;
     int     interactive; // terminal or script =>isatty(STDIN_FILEN)
 } t_shell;
@@ -109,7 +111,7 @@ t_env   *init_env(char **envp);
 t_env   *create_minimal_envp(void);
 char    *get_env_value(t_env *env, char *key);
 t_env   *create_env_node(char *key, char *value);
-void    builtin_update_env(t_shell *shell, t_cmd *cmd);
+int    builtin_update_env(t_shell *shell, t_cmd *cmd);
 t_env   *find_node(t_env *env, char *key);
 // PATH's function
 char	**get_paths(t_env *env);
@@ -134,7 +136,7 @@ int    expansion(t_shell *shell);
 // HEARDOC_PREPRARTION's functions
 void    heredoc_preparation(t_cmd *cmds);
 // BUILTIN's functions 
-void builtin_functions(t_shell *shell, t_token **tokens);
+int builtin_functions(t_shell *shell, t_token **tokens);
 int pwd_func(t_shell *shell);
 int echo_func(t_shell *shell, t_cmd *cmd);
 int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd);
@@ -155,9 +157,9 @@ int is_builtin(char **args);
 int calculate_nodes(t_env *env);
 char    **convert_list_to_array(t_env *env);
 char *check_access_pathname(char **paths, char *cmd, t_shell *shell);
-void execute_external_command(t_cmd *cmd, char **paths, t_shell *shell);
-void    builtin_with_redirection(t_shell *shell, t_token **tokens);
-void execute_single_command(t_shell *shell, char **paths, t_token **tokens);
-void execute_pipeline(t_shell *shell, char **paths, t_token **tokens);
+int execute_external_command(t_cmd *cmd, char **paths, t_shell *shell);
+int    builtin_with_redirection(t_shell *shell, t_token **tokens);
+int execute_single_command(t_shell *shell, char **paths, t_token **tokens);
+int execute_pipeline(t_shell *shell, char **paths, t_token **tokens);
 
 #endif

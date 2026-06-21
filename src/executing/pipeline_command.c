@@ -1,44 +1,54 @@
 #include "minishell.h"
 
-void    external_command_in_pipe(char **paths, t_cmd *cmd, t_shell *shell, char **envp)
+int    external_command_in_pipe(char **paths, t_cmd *cmd, t_shell *shell, char **envp)
 {
     char *pathname;
 
     pathname= NULL;
     pathname = check_access_pathname(paths, cmd->args[0], shell);
     if (!pathname)
+        return (1);
+    if (execve(pathname, cmd->args, envp) == -1)
     {
+        perror(cmd->args[0]);
+        free(shell->line);
         free_array(envp);
-        exit(shell->exit_status);
+        free_paths(paths);
+        free(pathname);
+        shell->exit_status = 126;
+        exit(126); 
     }
-    execve(pathname, cmd->args, envp);
-    perror(cmd->args[0]);
-    free_array(envp);
-    free(pathname);
-    exit(126); 
+    return (0);
 }
 
-void builtin_functions_in_pipe(t_shell *shell, t_token **tokens, t_cmd *cmd)
+int builtin_functions_in_pipe(t_shell *shell, t_token **tokens, t_cmd *cmd)
 {
-    if (!shell || !cmd || !cmd->args || !cmd->args[0]) return;
-    builtin_update_env(shell, cmd);
+    if (!shell || !cmd || !cmd->args || !cmd->args[0]) return (1);
+    if (builtin_update_env(shell, cmd)) return (1);
     if (ft_strncmp(cmd->args[0], "pwd", ft_strlen("pwd") + 1) == 0)
     {
         if (pwd_func(shell))
+        {
             ft_putstr_fd("minishell : pwd: error\n", STDERR_FILENO);
+            return (1);
+        }
     }
     if (ft_strncmp(cmd->args[0], "echo", ft_strlen("echo") + 1) == 0)
     {
         if(echo_func(shell, cmd))
+        {
             ft_putstr_fd("minishell : echo: error\n", STDERR_FILENO);
+            return (1);
+        }
     }
     if (ft_strncmp(cmd->args[0], "exit", ft_strlen("exit") + 1) == 0)
     {
-        if(exit_func(shell, *tokens, cmd))
-            ft_putstr_fd("minishell : exit : error\n", STDERR_FILENO);
+        return (exit_func(shell, *tokens, cmd));
     }
+    return (0);
 }
-void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
+
+int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
 {
     int pipefd[2];
     int prev_fd;
@@ -51,10 +61,10 @@ void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
     
     cmds = shell->cmds;
     envp = convert_list_to_array(shell->env);
-    if (!envp) return;
+    if (!envp) return(1);
     count = count_node(cmds);
     pids = malloc((count)* sizeof(pid_t));
-    if (!pids) return (free_array(envp));
+    if (!pids) return (free_array(envp),1);
     prev_fd = -1;
     i = 0;
     while(cmds)
@@ -72,7 +82,7 @@ void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
             free_array(envp);
             free(pids);
             shell->exit_status = 1;
-            return;
+            return (1);
         }
         pids[i] = fork();
         if (pids[i] == -1 )
@@ -87,38 +97,72 @@ void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
             free_array(envp);
             free(pids);
             shell->exit_status = 1;
-            return;
+            return (1);
         }
         if (pids[i] == 0)
         {
             if (prev_fd != -1)
             {
                 if (dup2(prev_fd , STDIN_FILENO) == -1)
+                {
+                    free_cmds(shell->cmds);
+                    free_envs(shell->env);
+                    free(shell->line);
+                    free_paths(paths);
+                    free_array(envp);
+                    free(pids);
                     exit(1);
+                }
                 close(prev_fd);
             }
             if (cmds->next)
             {
                 if(dup2(pipefd[1], STDOUT_FILENO) == -1)
+                {
+                    free_cmds(shell->cmds);
+                    free_envs(shell->env);
+                    free(shell->line);
+                    free_paths(paths);
+                    free_array(envp);
+                    free(pids);
                     exit(1);
+                }
                 close(pipefd[1]);
                 close(pipefd[0]);
             }
             if (apply_redirection(cmds->redirects))
             {
+                free_cmds(shell->cmds);
+                free_envs(shell->env);
+                free(shell->line);
+                free_paths(paths);
                 free_array(envp);
                 free(pids);
                 exit(1);
             }
             if (is_builtin(cmds->args))
             {
+                shell->in_pipe = 1;
                 builtin_functions_in_pipe(shell, tokens, cmds);
+                free_cmds(shell->cmds);
+                free_envs(shell->env);
+                free(shell->line);
+                free_paths(paths);
                 free_array(envp);
                 free(pids);
                 exit(shell->exit_status);
             }
             else
-                external_command_in_pipe(paths, cmds, shell, envp);  
+                if (external_command_in_pipe(paths, cmds, shell, envp))
+                {
+                    free_cmds(shell->cmds);
+                    free_envs(shell->env);
+                    free(shell->line);
+                    free_paths(paths);
+                    free_array(envp);
+                    free(pids);
+                    exit(shell->exit_status);
+                }
         }
         else
         {
@@ -149,4 +193,5 @@ void execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
     }
     free_array(envp);
     free(pids);
+    return (0);
 }

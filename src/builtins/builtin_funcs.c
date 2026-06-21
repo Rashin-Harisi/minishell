@@ -57,26 +57,24 @@ int echo_func(t_shell *shell, t_cmd *cmd)
 
 int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd)
 {
+    (void)tokens;
     int code = 0;
     if (cmd->args[0] && !cmd->args[1])
     {
-        free_cmds(shell->cmds);
-        free_envs(shell->env);
-        free_tokens(tokens);
-        if (shell->interactive)
+        if (shell->interactive && !shell->in_pipe)
             ft_putstr_fd("exit\n", STDERR_FILENO);
-        exit(shell->exit_status);
+        shell->exit_status = 0;
+        return (2);
     }
     if (!is_valid_arg(cmd->args[1]))
     {
         ft_putstr_fd("minishell: exit: ", STDERR_FILENO);
         ft_putstr_fd(cmd->args[1], STDERR_FILENO);
         ft_putstr_fd(": numeric argument required\n", STDERR_FILENO);
-        if (shell->interactive) ft_putstr_fd("exit\n", STDERR_FILENO);
-        free_cmds(shell->cmds);
-        free_envs(shell->env);
-        free_tokens(tokens);
-        exit(2);
+        if (shell->interactive && !shell->in_pipe) 
+            ft_putstr_fd("exit\n", STDERR_FILENO);
+        shell->exit_status = 2;
+        return (2);
     }
     if (cmd->args[2])
     {
@@ -84,32 +82,36 @@ int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd)
         shell->exit_status = 1;
         return (1);
     }
-    if (shell->interactive)
+    if (shell->interactive && !shell->in_pipe)
         ft_putstr_fd("exit\n", STDERR_FILENO);
     code = ft_atoi(cmd->args[1]);
-    free_cmds(shell->cmds);
-    free_envs(shell->env);
-    free_tokens(tokens);
-    exit(code);
+    shell->exit_status = code;
+    return (2);
 }
 
-void builtin_functions(t_shell *shell, t_token **tokens)
+int builtin_functions(t_shell *shell, t_token **tokens)
 {
-    if (!shell || !shell->cmds->args || !shell->cmds->args[0]) return;
-    builtin_update_env(shell, shell->cmds);
+    if (!shell || !shell->cmds->args || !shell->cmds->args[0]) return(1);
+    if (builtin_update_env(shell, shell->cmds)) return (1);
     if (ft_strncmp(shell->cmds->args[0], "pwd", ft_strlen("pwd") + 1) == 0)
     {
         if (pwd_func(shell))
+        {
             ft_putstr_fd("minishell : pwd: error\n", STDERR_FILENO);
+            return (1);
+        }
     }
     if (ft_strncmp(shell->cmds->args[0], "echo", ft_strlen("echo") + 1) == 0)
     {
         if(echo_func(shell, shell->cmds))
+        {
             ft_putstr_fd("minishell : echo: error\n", STDERR_FILENO);
+            return (1);
+        }
     }
     if (ft_strncmp(shell->cmds->args[0], "exit", ft_strlen("exit") + 1) == 0)
     {
-        if(exit_func(shell, *tokens, shell->cmds))
-            ft_putstr_fd("minishell : exit : error\n", STDERR_FILENO);
+        return (exit_func(shell, *tokens, shell->cmds));
     }
+    return (0);
 }

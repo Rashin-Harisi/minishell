@@ -30,7 +30,7 @@ int update_env_value(t_env **env, char *key, char *new_value)
     new = create_env_node(key, new_value);
     if (!new)
         return (1);
-    node->has_equal = 1;
+    new->has_equal = 1;
     ft_lstadd_back_env(env, new);
     return (0);
 }
@@ -209,16 +209,16 @@ int export_env_func(char **args, t_shell *shell)
         }
     }
     shell->exit_status = status;
-    return (status);
+    return (0);
 }
 
-void remove_env_node(t_env **env, t_env *node)
+int remove_env_node(t_env **env, t_env *node)
 {
     t_env *curr;
     t_env *prev;
 
     if (!env || !*env || !node)
-        return;
+        return (1);
     curr = *env;
     prev = NULL;
     while (curr)
@@ -232,11 +232,12 @@ void remove_env_node(t_env **env, t_env *node)
             free(curr->key);
             free(curr->value);
             free(curr);
-            return;
+            return (0);
         }
         prev = curr;
         curr = curr->next;
     }
+    return (0);
 }
 
 int unset_env_func(char **args, t_shell *shell)
@@ -255,11 +256,11 @@ int unset_env_func(char **args, t_shell *shell)
         }
         node = find_node(shell->env, args[i]);
         if (node)
-            remove_env_node(&shell->env, node);
+            return remove_env_node(&shell->env, node);
         i++;
     }
     shell->exit_status = status;
-    return (status);
+    return (0);
 }
 
 int env_func(t_shell *shell)
@@ -277,28 +278,41 @@ int env_func(t_shell *shell)
     return (0);
 }
 
-void builtin_update_env(t_shell *shell, t_cmd *cmd)
+int builtin_update_env(t_shell *shell, t_cmd *cmd)
 {
     if (!cmd || !cmd->args || !cmd->args[0])
-        return;
+        return (1);
     if (ft_strncmp(cmd->args[0], "cd", ft_strlen("cd") + 1) == 0)
     {
         if (cd_env_func(cmd->args, shell))
+        {
             ft_putstr_fd("minishell : cd : error\n", STDERR_FILENO);
+            return (1);
+        }
     }
     if (ft_strncmp(cmd->args[0], "export", ft_strlen("export") + 1) == 0)
     {
         if (export_env_func(cmd->args, shell))
+        {
             ft_putstr_fd("minishell : export : error\n", STDERR_FILENO);
+            return (1);
+        }
     }
     if (ft_strncmp(cmd->args[0], "unset", ft_strlen("unset") + 1) == 0)
     {
         if (unset_env_func(cmd->args, shell))
+        {
             ft_putstr_fd("minishell : unset : error\n", STDERR_FILENO);
+            return (1);
+        }
     }
     if (ft_strncmp(cmd->args[0], "env", ft_strlen("env") + 1) == 0)
     {
         if (env_func(shell))
+        {
             ft_putstr_fd("minishell : env: error\n", STDERR_FILENO);
+            return (1);
+        }
     }
+    return (0);
 }
