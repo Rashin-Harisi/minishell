@@ -61,7 +61,7 @@ int main(int argc, char **argv, char **envp)
 		if (!tokens)
 		{
 			ft_putstr_fd("Syntax error quotation\n", STDERR_FILENO);
-			shell.exit_status = 1;
+			shell.exit_status = 2;
 			free_iteration(tokens, shell.cmds, shell.line);
 			rl_on_new_line();
 			continue;
@@ -70,7 +70,7 @@ int main(int argc, char **argv, char **envp)
 		if (syntax_check(tokens))
 		{
 			ft_putstr_fd("Syntax error pipe, redirection, semicolon, ampersand, or parenthesis\n", STDERR_FILENO);
-			shell.exit_status = 1;
+			shell.exit_status = 2;
 			free_iteration(tokens, shell.cmds, shell.line);
 			rl_on_new_line();
 			continue;
