@@ -19,7 +19,6 @@ char *check_access_pathname(char **paths, char *cmd, t_shell *shell)
     if (!paths)
     {
         shell->exit_status = 127;
-        ft_putstr_fd("minishell: ",2);
         ft_putstr_fd(cmd ,2);
         ft_putstr_fd(": command not found\n",2);
         return (NULL);
@@ -37,7 +36,6 @@ char *check_access_pathname(char **paths, char *cmd, t_shell *shell)
         i++;
     }
     shell->exit_status = 127;
-    ft_putstr_fd("minishell: ",2);
     ft_putstr_fd(cmd ,2);
     ft_putstr_fd(": command not found\n",2);
     return (NULL);

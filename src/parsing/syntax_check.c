@@ -44,7 +44,7 @@ int has_forbidden_chart(t_token *curr)
     return (0);
 }
 
-int syntax_check(t_token *tokens)
+int syntax_check(t_token *tokens, t_shell *shell)
 {
 
     t_token *prev;
@@ -52,15 +52,29 @@ int syntax_check(t_token *tokens)
 
     prev = NULL;
     curr = tokens;
+    shell->syntax_check = NULL;
     while(curr)
     {
-        if (has_forbidden_chart(curr)) return (1);
-        if (curr->type == TOKEN_PIPE && !pipe_validation(prev, curr))
+        if (has_forbidden_chart(curr))
+        {
+            shell->syntax_check = curr->value;
             return (1);
+        }
+        if (curr->type == TOKEN_PIPE && !pipe_validation(prev, curr))
+        {
+            shell->syntax_check = curr->value;
+            return (1);
+        }
         if ((curr->type == TOKEN_APPEND || curr->type == TOKEN_HEREDOC
             || curr->type == TOKEN_REDIR_IN || curr->type == TOKEN_REDIR_OUT)
             && !redir_validation(curr))
-            return (1);
+            {
+                if (curr->next)
+                    shell->syntax_check = curr->next->value;
+                else
+                    shell->syntax_check = "newline";
+                return (1);
+            }
         prev = curr;
         curr = curr->next;
     }

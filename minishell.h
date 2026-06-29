@@ -5,7 +5,6 @@
 # include <readline/readline.h>
 # include <readline/history.h>
 # include <sys/types.h>
-//# include <sys/acl.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
@@ -20,6 +19,7 @@
 # include <termcap.h>
 # include <linux/limits.h>
 # include "libft/libft.h"
+
 /*======================Forward Declaration=============*/
 typedef struct s_env t_env;
 typedef struct s_cmd t_cmd;
@@ -63,6 +63,7 @@ typedef struct s_shell
     t_env   *env;
     t_cmd   *cmds;
     char    *line;
+    char    *syntax_check;
     int     in_pipe;
     int     exit_status;
     int     interactive; // terminal or script =>isatty(STDIN_FILEN)
@@ -98,6 +99,12 @@ typedef struct s_cmd
     struct s_cmd    *next;
 } t_cmd;
 
+typedef struct s_flags
+{
+    int single_quote;
+    int double_quote;
+} t_flags;
+
 #ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42
 #endif
@@ -111,7 +118,6 @@ t_env   *init_env(char **envp);
 t_env   *create_minimal_envp(void);
 char    *get_env_value(t_env *env, char *key);
 t_env   *create_env_node(char *key, char *value);
-int    builtin_update_env(t_shell *shell, t_cmd *cmd);
 t_env   *find_node(t_env *env, char *key);
 // PATH's function
 char	**get_paths(t_env *env);
@@ -128,18 +134,44 @@ char    *each_part_extract(char *line, int *index, int *syntax_error);
 void    skip_spaces(char *line, int *index);
 t_token *create_tokens(char *line);
 // SYNTAX_CHECK's functions
-int syntax_check(t_token *tokens);
+int syntax_check(t_token *tokens, t_shell *shell);
 // CMDS' functions
 t_cmd   *create_cmds(t_token *tokens);
 void    free_cmds(t_cmd *cmds);
-int    expansion(t_shell *shell);
+void    free_array(char **args);
+void    free_redirects(t_redir *redir);
+void    free_one_cmd(t_cmd *cmd);
+void    ft_lstadd_back_cmds(t_cmd **cmds, t_cmd *node);
+void    ft_lstadd_back_redirects(t_redir **redir, t_redir *node);
+t_redir *init_redirect(t_token *tokens);
+int     count_args(t_token *tokens);
+// EXPANSION's functions
+int     expansion(t_shell *shell);
+int     is_specific_char(char s);
+char    *find_var_value(char *var, t_env *envs);
+char    *append_str(char *str, char *s);
+char    *append_char(char *str, char s);
+char    *expand_var(char *str, int *i, t_shell *shell, char *expanded);
+char    *expansion_string(char *str, t_shell *shell);
+int     expansion_args(char **args, t_shell *shell);
+int     expansion_redir(t_redir *redir, t_shell *shell);
 // HEARDOC_PREPRARTION's functions
 void    heredoc_preparation(t_cmd *cmds);
 // BUILTIN's functions 
-int builtin_functions(t_shell *shell, t_token **tokens);
-int pwd_func(t_shell *shell);
-int echo_func(t_shell *shell, t_cmd *cmd);
-int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd);
+int     builtin_functions(t_shell *shell, t_token **tokens);
+int     builtin_update_env(t_shell *shell, t_cmd *cmd);
+int     pwd_func(t_shell *shell);
+int     echo_func(t_shell *shell, t_cmd *cmd);
+int     exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd);
+int     cd_env_func(char **args, t_shell *shell);
+int     env_func(t_shell *shell);
+int     export_env_func(char **args, t_shell *shell);
+t_env   *find_node(t_env *env, char *key);
+int     update_env_value(t_env **env, char *key, char *new_value);
+int     is_valid_name(char *str);
+void    print_identifier_error(char *func, char *str, char *value);
+int     unset_env_func(char **args, t_shell *shell);
+
 // UTILS' functions
 void	print_envs(t_env *env);
 void	print_tokens(t_token *tokens);
@@ -147,19 +179,19 @@ void	print_paths(char **paths);
 int	    is_empty_line(char *line);
 void	print_cmds(t_cmd *cmds);
 void    free_array(char **args);
-char *get_next_line(int fd);
+char    *get_next_line(int fd);
 //EXECUTION's functions
-int execution(t_shell *shell, t_token **tokens, char **paths);
-int check_redirection(t_cmd *cmds);
-int apply_redirection(t_redir *redirects);
-int count_node(t_cmd *cmds);
-int is_builtin(char **args);
-int calculate_nodes(t_env *env);
+int     execution(t_shell *shell, t_token **tokens, char **paths);
+int     check_redirection(t_cmd *cmds);
+int     apply_redirection(t_redir *redirects);
+int     count_node(t_cmd *cmds);
+int     is_builtin(char **args);
+int     calculate_nodes(t_env *env);
 char    **convert_list_to_array(t_env *env);
-char *check_access_pathname(char **paths, char *cmd, t_shell *shell);
-int execute_external_command(t_cmd *cmd, char **paths, t_shell *shell);
-int    builtin_with_redirection(t_shell *shell, t_token **tokens);
-int execute_single_command(t_shell *shell, char **paths, t_token **tokens);
-int execute_pipeline(t_shell *shell, char **paths, t_token **tokens);
+char    *check_access_pathname(char **paths, char *cmd, t_shell *shell);
+int     execute_external_command(t_cmd *cmd, char **paths, t_shell *shell);
+int     builtin_with_redirection(t_shell *shell, t_token **tokens);
+int     execute_single_command(t_shell *shell, char **paths, t_token **tokens);
+int     execute_pipeline(t_shell *shell, char **paths, t_token **tokens);
 
 #endif

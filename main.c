@@ -67,9 +67,11 @@ int main(int argc, char **argv, char **envp)
 			continue;
 		}
 		//print_tokens(tokens);
-		if (syntax_check(tokens))
+		if (syntax_check(tokens, &shell))
 		{
-			ft_putstr_fd("Syntax error pipe, redirection, semicolon, ampersand, or parenthesis\n", STDERR_FILENO);
+			ft_putstr_fd("syntax error near unexpected token `", STDERR_FILENO);
+			ft_putstr_fd(shell.syntax_check, STDERR_FILENO);
+			ft_putstr_fd("'\n", STDERR_FILENO);
 			shell.exit_status = 2;
 			free_iteration(tokens, shell.cmds, shell.line);
 			rl_on_new_line();

@@ -5,24 +5,35 @@ MANDATORY_SRC	= main.c\
 				./env/env.c \
 				./env/create_minimal_envp.c \
 				./env/get_path.c \
-				./src/parsing/tokens.c \
-				./utils/utils.c \
-				./signals/signals.c \
-				./utils/prompt.c \
 				./env/helper.c \
+				./signals/signals.c \
+				./utils/utils.c \
+				./utils/prompt.c \
+				./utils/get_next_line.c\
+				./src/parsing/tokens.c \
+				./src/parsing/helpers_tokens.c\
 				./src/parsing/syntax_check.c \
 				./src/parsing/cmds.c \
+				./src/parsing/helpers_cmds.c\
 				./src/parsing/expansion.c \
+				./src/parsing/helpers_expansion.c\
 				./src/heardoc_prepration/prepration.c \
 				./src/builtins/update_env.c \
 				./src/builtins/builtin_funcs.c \
+				./src/builtins/cd.c\
+				./src/builtins/echo.c\
+				./src/builtins/env.c\
+				./src/builtins/exit.c\
+				./src/builtins/export.c\
+				./src/builtins/helpers.c\
+				./src/builtins/pwd.c\
+				./src/builtins/unset.c\
 				./src/executing/execution.c \
 				./src/executing/access.c \
 				./src/executing/pipeline_command.c \
 				./src/executing/redirections.c \
 				./src/executing/single_command.c \
-				./src/executing/utils.c \
-				./utils/get_next_line.c
+				./src/executing/utils.c 
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 
