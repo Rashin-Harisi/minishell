@@ -46,7 +46,10 @@ int execute_external_command(t_cmd *cmd, char **paths, t_shell *shell)
         perror(cmd->args[0]);
         free_array(envp);
         free(pathname);
-        shell->exit_status = 126;
+        free_cmds(shell->cmds);
+        free_envs(shell->env);
+        free(shell->line);
+        free_paths(paths);
         exit(126);
     }
     else
@@ -72,6 +75,10 @@ int builtin_with_redirection(t_shell *shell, t_token **tokens)
     saved_stdout = dup(STDOUT_FILENO);
     if (saved_stdin == -1 || saved_stdout == -1) 
     {
+        if (saved_stdin != -1)
+            close(saved_stdin);
+        if (saved_stdout != -1)
+            close(saved_stdout);
         shell->exit_status = 1;
         return (1);
     }

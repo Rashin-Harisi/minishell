@@ -20,8 +20,8 @@ void    free_redirects(t_redir *redir)
 
     while(redir)
     {
-        cur = redir-> next;
-        if (redir->fd != -1)
+        cur = redir->next;
+        if (redir->type == REDIR_HEREDOC && redir->fd >= 0)
             close(redir->fd);
         free(redir->filename);
         free(redir);
@@ -103,6 +103,12 @@ t_redir *init_redirect(t_token *tokens)
         tmp->type = REDIR_IN;
     else if (tokens->type == TOKEN_REDIR_OUT)
         tmp->type = REDIR_OUT;
+    else
+    {
+        free(tmp->filename);
+        free(tmp);
+        return (NULL);
+    }
     tmp->next = NULL;
     return (tmp);
 } 

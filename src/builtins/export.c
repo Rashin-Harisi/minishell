@@ -27,7 +27,7 @@ static char *get_export_value(char *arg)
 
     equal = ft_strchr(arg, '=');
     if (!equal)
-        return (ft_strdup(""));
+        return (NULL);
     return (ft_strdup(equal + 1));
 }
 
@@ -52,7 +52,7 @@ int export_env_func(char **args, t_shell *shell)
             has_equal = (ft_strchr(args[i], '=') != NULL);
             key = get_export_key(args[i]);
             value = get_export_value(args[i]);
-            if (!key || !value)
+            if (!key || ( has_equal && !value))
             {
                 free(key);
                 free(value);

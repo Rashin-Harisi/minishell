@@ -6,10 +6,10 @@ void    prepare_reading_pipe(t_redir *redir)
     int fd_pipe[2];
 
     if (!redir || !redir->filename) return;
+    redir->fd = -1;
     if (pipe(fd_pipe) == -1)
     {
         perror("pipe");
-        redir->fd = -1;
         return;
     }
     while (1)

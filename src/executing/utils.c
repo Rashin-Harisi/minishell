@@ -25,18 +25,18 @@ int is_builtin(char **args)
 
 int calculate_nodes(t_env *env)
 {
-    t_env   *tmp;
-    int     i;
+    int i;
 
     i = 0;
-    tmp = env;
-    while(tmp)
+    while (env)
     {
-        i++;
-        tmp = tmp->next;
+        if (env->has_equal)
+            i++;
+        env = env->next;
     }
     return (i);
 }
+
 char    **convert_list_to_array(t_env *env)
 {
     char    **envp;
@@ -44,18 +44,21 @@ char    **convert_list_to_array(t_env *env)
     int     i;
     char    *line;
 
-    tmp = env;
     i = 0;
     envp = ft_calloc((calculate_nodes(env) + 1) , sizeof(char *));
     if (!envp) return NULL;
+    tmp = env;
     while(tmp)
     {
-        line = ft_strjoin(tmp->key, "=");
-        if (!line) return (free_array(envp), NULL);
-        envp[i] = ft_strjoin(line, tmp->value);
-        free(line);
-        if (!envp[i]) return (free_array(envp), NULL);
-        i++;
+        if (tmp->has_equal)
+        {
+            line = ft_strjoin(tmp->key, "=");
+            if (!line) return (free_array(envp), NULL);
+            envp[i] = ft_strjoin(line, tmp->value);
+            free(line);
+            if (!envp[i]) return (free_array(envp), NULL);
+            i++;
+        }
         tmp = tmp->next;
     }
     envp[i] = NULL;

@@ -35,8 +35,8 @@ int execution(t_shell *shell, t_token **tokens, char **paths)
 {
     if (special_command_check(shell->cmds, shell))
         return (shell->exit_status);
-    if (check_redirection(shell->cmds))
-        return (1);
+    //if (check_redirection(shell->cmds))
+    //   return (1);
     if (count_node(shell->cmds) == 1)
         return execute_single_command(shell, paths, tokens);
     else

@@ -59,7 +59,10 @@ int apply_redirection(t_redir *redirects)
         else if (redir->type == REDIR_OUT)
             fd = open(redir->filename, O_WRONLY | O_CREAT | O_TRUNC, 0644);
         else if (redir->type == REDIR_HEREDOC)
+        {
             fd = redir->fd;
+            redir->fd = -1;
+        }
         else if (redir->type == REDIR_APPEND)
             fd = open(redir->filename, O_WRONLY | O_CREAT | O_APPEND, 0644);
         if (fd == -1)

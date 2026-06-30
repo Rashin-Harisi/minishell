@@ -23,7 +23,7 @@ char	**get_paths(t_env *env)
     {
         if(ft_strncmp(env->key, "PATH", 5) == 0)
         {
-            if (!env->value)
+            if (!env->value || !env->has_equal)
                 return (NULL);
 			return (ft_split(env->value, ':'));
         }

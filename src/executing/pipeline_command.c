@@ -15,7 +15,8 @@ int    external_command_in_pipe(char **paths, t_cmd *cmd, t_shell *shell, char *
         free_array(envp);
         free_paths(paths);
         free(pathname);
-        shell->exit_status = 126;
+        free_cmds(shell->cmds);
+        free_envs(shell->env);
         exit(126); 
     }
     return (0);
@@ -46,6 +47,16 @@ int builtin_functions_in_pipe(t_shell *shell, t_token **tokens, t_cmd *cmd)
         return (exit_func(shell, *tokens, cmd));
     }
     return (0);
+}
+
+void free_child_pipeline(t_shell *shell, char **paths, char **envp, pid_t *pids)
+{
+    free_cmds(shell->cmds);
+    free_envs(shell->env);
+    free(shell->line);
+    free_paths(paths);
+    free_array(envp);
+    free(pids);
 }
 
 int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
@@ -105,12 +116,14 @@ int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
             {
                 if (dup2(prev_fd , STDIN_FILENO) == -1)
                 {
-                    free_cmds(shell->cmds);
-                    free_envs(shell->env);
-                    free(shell->line);
-                    free_paths(paths);
-                    free_array(envp);
-                    free(pids);
+                    if (prev_fd != -1)
+                        close(prev_fd);
+                    if (cmds->next)
+                    {
+                        close(pipefd[0]);
+                        close(pipefd[1]);
+                    }
+                    free_child_pipeline(shell, paths, envp, pids);
                     exit(1);
                 }
                 close(prev_fd);
@@ -119,12 +132,11 @@ int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
             {
                 if(dup2(pipefd[1], STDOUT_FILENO) == -1)
                 {
-                    free_cmds(shell->cmds);
-                    free_envs(shell->env);
-                    free(shell->line);
-                    free_paths(paths);
-                    free_array(envp);
-                    free(pids);
+                    if (prev_fd != -1)
+                        close(prev_fd);
+                    close(pipefd[0]);
+                    close(pipefd[1]);
+                    free_child_pipeline(shell, paths, envp, pids);
                     exit(1);
                 }
                 close(pipefd[1]);
@@ -132,35 +144,20 @@ int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
             }
             if (apply_redirection(cmds->redirects))
             {
-                free_cmds(shell->cmds);
-                free_envs(shell->env);
-                free(shell->line);
-                free_paths(paths);
-                free_array(envp);
-                free(pids);
+                free_child_pipeline(shell, paths, envp, pids);
                 exit(1);
             }
             if (is_builtin(cmds->args))
             {
                 shell->in_pipe = 1;
                 builtin_functions_in_pipe(shell, tokens, cmds);
-                free_cmds(shell->cmds);
-                free_envs(shell->env);
-                free(shell->line);
-                free_paths(paths);
-                free_array(envp);
-                free(pids);
+                free_child_pipeline(shell, paths, envp, pids);
                 exit(shell->exit_status);
             }
             else
                 if (external_command_in_pipe(paths, cmds, shell, envp))
                 {
-                    free_cmds(shell->cmds);
-                    free_envs(shell->env);
-                    free(shell->line);
-                    free_paths(paths);
-                    free_array(envp);
-                    free(pids);
+                    free_child_pipeline(shell, paths, envp, pids);
                     exit(shell->exit_status);
                 }
         }

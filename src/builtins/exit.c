@@ -25,7 +25,6 @@ int exit_func(t_shell *shell, t_token *tokens, t_cmd *cmd)
     {
         if (shell->interactive && !shell->in_pipe)
             ft_putstr_fd("exit\n", STDERR_FILENO);
-        shell->exit_status = 0;
         return (2);
     }
     if (!is_valid_arg(cmd->args[1]))
