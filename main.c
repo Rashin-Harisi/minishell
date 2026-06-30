@@ -91,7 +91,7 @@ int main(int argc, char **argv, char **envp)
 			free_iteration(tokens, shell.cmds, shell.line);
 			continue;
 		}
-		print_cmds(shell.cmds);
+		//print_cmds(shell.cmds);
 		heredoc_preparation(shell.cmds, &shell);
 		free_paths(paths);
 		paths = get_paths(shell.env);

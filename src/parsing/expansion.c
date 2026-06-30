@@ -23,10 +23,13 @@ int    expansion_redir(t_redir *redir, t_shell *shell)
     
     while (redir)
     {
-        expanded = expansion_string(redir->filename, shell);
-        if (!expanded) return (1);
-        free(redir->filename);
-        redir->filename = expanded;
+        if (redir->type != REDIR_HEREDOC)
+        {
+            expanded = expansion_string(redir->filename, shell);
+            if (!expanded) return (1);
+            free(redir->filename);
+            redir->filename = expanded;
+        }
         redir = redir->next;
     }
     return (0);

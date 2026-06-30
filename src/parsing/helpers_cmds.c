@@ -84,6 +84,55 @@ void    ft_lstadd_back_redirects(t_redir **redir, t_redir *node)
 	}
 }
 
+int has_quote(char *str)
+{
+    int i;
+
+    i = 0;
+    while (str && str[i])
+    {
+        if (str[i] == '\'' || str[i] == '"')
+            return (1);
+        i++;
+    }
+    return (0);
+}
+
+char	*removal_quote_only(char *str)
+{
+    int     i;
+    int     single_quote;
+    int     double_quote;
+    char    *expanded;
+    
+    if (!str) return (NULL);
+    i = 0;
+    single_quote = 0;
+    double_quote = 0;
+    expanded = ft_strdup("");
+    if (!expanded) return (NULL);
+    while (str[i])
+    {
+        if (str[i] == '\'' && !double_quote)
+        {
+            single_quote = !single_quote;
+            i++;
+            continue;
+        }
+        if (str[i] == '"' && !single_quote)
+        {
+            double_quote = !double_quote;
+            i++;
+            continue;
+        }
+        expanded = append_char(expanded, str[i]);
+        if (!expanded) return (NULL);
+        i++;        
+    }
+    return (expanded);
+
+}
+
 t_redir *init_redirect(t_token *tokens)
 {
     t_redir *tmp;
@@ -93,16 +142,19 @@ t_redir *init_redirect(t_token *tokens)
     tmp = malloc(sizeof(t_redir));
     if (!tmp) return (NULL);
     tmp->fd = -1;
+    tmp->quoted = 0;
+    tmp->next = NULL;
     tmp->filename = ft_strdup(tokens->next->value);
     if (!tmp->filename) return(free(tmp), NULL);
     if (tokens->type == TOKEN_APPEND)
         tmp->type = REDIR_APPEND;
     else if (tokens->type == TOKEN_HEREDOC)
     {
-        if (tokens->next->value[0] == '\'' || tokens->next->value[0] == '"')
-            tmp->quoted = 1;
-        else
-            tmp->quoted = 0;
+        tmp->quoted = has_quote(tokens->next->value);
+        free(tmp->filename);
+        tmp->filename = removal_quote_only(tokens->next->value);
+        if (!tmp->filename)
+            return (free(tmp), NULL);
         tmp->type = REDIR_HEREDOC;
     }
     else if (tokens->type == TOKEN_REDIR_IN)
@@ -115,7 +167,6 @@ t_redir *init_redirect(t_token *tokens)
         free(tmp);
         return (NULL);
     }
-    tmp->next = NULL;
     return (tmp);
 } 
 
