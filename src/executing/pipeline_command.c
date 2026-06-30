@@ -49,8 +49,10 @@ int builtin_functions_in_pipe(t_shell *shell, t_token **tokens, t_cmd *cmd)
     return (0);
 }
 
-void free_child_pipeline(t_shell *shell, char **paths, char **envp, pid_t *pids)
+void free_child_pipeline(t_shell *shell, char **paths, char **envp, pid_t *pids, t_token **tokens)
 {
+    if(tokens && *tokens)
+        free_tokens(*tokens);
     free_cmds(shell->cmds);
     free_envs(shell->env);
     free(shell->line);
@@ -123,7 +125,7 @@ int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
                         close(pipefd[0]);
                         close(pipefd[1]);
                     }
-                    free_child_pipeline(shell, paths, envp, pids);
+                    free_child_pipeline(shell, paths, envp, pids, tokens);
                     exit(1);
                 }
                 close(prev_fd);
@@ -136,7 +138,7 @@ int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
                         close(prev_fd);
                     close(pipefd[0]);
                     close(pipefd[1]);
-                    free_child_pipeline(shell, paths, envp, pids);
+                    free_child_pipeline(shell, paths, envp, pids, tokens);
                     exit(1);
                 }
                 close(pipefd[1]);
@@ -144,20 +146,20 @@ int execute_pipeline(t_shell *shell, char **paths, t_token **tokens)
             }
             if (apply_redirection(cmds->redirects))
             {
-                free_child_pipeline(shell, paths, envp, pids);
+                free_child_pipeline(shell, paths, envp, pids, tokens);
                 exit(1);
             }
             if (is_builtin(cmds->args))
             {
                 shell->in_pipe = 1;
                 builtin_functions_in_pipe(shell, tokens, cmds);
-                free_child_pipeline(shell, paths, envp, pids);
+                free_child_pipeline(shell, paths, envp, pids, tokens);
                 exit(shell->exit_status);
             }
             else
                 if (external_command_in_pipe(paths, cmds, shell, envp))
                 {
-                    free_child_pipeline(shell, paths, envp, pids);
+                    free_child_pipeline(shell, paths, envp, pids, tokens);
                     exit(shell->exit_status);
                 }
         }

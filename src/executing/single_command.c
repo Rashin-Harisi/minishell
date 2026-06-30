@@ -115,7 +115,7 @@ int execute_single_command(t_shell *shell, char **paths, t_token **tokens)
     t_cmd *cmds;
 
     cmds = shell->cmds;
-    if (!cmds->args || !cmds->args[0]) return (1);
+    if (!cmds->args || !cmds->args[0]) return (only_redirection(cmds, shell));
     if (is_builtin(cmds->args))
         return builtin_with_redirection(shell, tokens);
     else

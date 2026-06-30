@@ -89,6 +89,7 @@ typedef struct s_redir
     t_redir_type     type;
     int              fd;
     char            *filename;
+    int             quoted;
     struct s_redir  *next;
 } t_redir;
 
@@ -156,7 +157,7 @@ char    *expansion_string(char *str, t_shell *shell);
 int     expansion_args(char **args, t_shell *shell);
 int     expansion_redir(t_redir *redir, t_shell *shell);
 // HEARDOC_PREPRARTION's functions
-void    heredoc_preparation(t_cmd *cmds);
+void    heredoc_preparation(t_cmd *cmds, t_shell *shell);
 // BUILTIN's functions 
 int     builtin_functions(t_shell *shell, t_token **tokens);
 int     builtin_update_env(t_shell *shell, t_cmd *cmd);
@@ -183,6 +184,7 @@ char    *get_next_line(int fd);
 //EXECUTION's functions
 int     execution(t_shell *shell, t_token **tokens, char **paths);
 int     check_redirection(t_cmd *cmds);
+int     only_redirection(t_cmd *cmd, t_shell *shell);
 int     apply_redirection(t_redir *redirects);
 int     count_node(t_cmd *cmds);
 int     is_builtin(char **args);

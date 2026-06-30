@@ -1,14 +1,14 @@
 #include "minishell.h"
 
+int is_shell_space(char c)
+{
+    return (c == ' ' || c == '\t');
+}
+
 void    skip_spaces(char *line, int *index)
 {
-    while (line[*index] != '\0')
-    {
-        if(line[*index] == ' ' || line[*index] == 9)
-           (*index)++;
-        else
-            return;
-    }
+     while (line[*index] && is_shell_space(line[*index]))
+        (*index)++;
 }
 
 char    *each_part_extract(char *line, int *index, int *syntax_error)
@@ -51,7 +51,7 @@ char    *each_part_extract(char *line, int *index, int *syntax_error)
             flags.double_quote = !flags.double_quote;
         if(line[*index] == '\'' && !flags.double_quote)
             flags.single_quote = !flags.single_quote;
-        if(line[*index] == ' ' && (!flags.single_quote && !flags.double_quote))
+        if(is_shell_space(line[*index]) && (!flags.single_quote && !flags.double_quote))
         {
             len = (*index) - start;
             (*index)++;

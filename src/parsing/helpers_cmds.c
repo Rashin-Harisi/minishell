@@ -98,7 +98,13 @@ t_redir *init_redirect(t_token *tokens)
     if (tokens->type == TOKEN_APPEND)
         tmp->type = REDIR_APPEND;
     else if (tokens->type == TOKEN_HEREDOC)
+    {
+        if (tokens->next->value[0] == '\'' || tokens->next->value[0] == '"')
+            tmp->quoted = 1;
+        else
+            tmp->quoted = 0;
         tmp->type = REDIR_HEREDOC;
+    }
     else if (tokens->type == TOKEN_REDIR_IN)
         tmp->type = REDIR_IN;
     else if (tokens->type == TOKEN_REDIR_OUT)

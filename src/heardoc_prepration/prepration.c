@@ -1,9 +1,10 @@
 #include "minishell.h"
 
-void    prepare_reading_pipe(t_redir *redir)
+void    prepare_reading_pipe(t_redir *redir, t_shell *shell)
 {
     char *line;
     int fd_pipe[2];
+    char    *expanded;
 
     if (!redir || !redir->filename) return;
     redir->fd = -1;
@@ -16,23 +17,32 @@ void    prepare_reading_pipe(t_redir *redir)
     {
         line = readline("heredoc> ");
         if (!line) break ;
-        if (ft_strncmp(line, redir->filename, ft_strlen(redir->filename) + 1) == 0)
+        if (!redir->quoted)
+            expanded = expansion_string(line, shell);
+        else
+            expanded = ft_strdup(line);
+        free(line);
+        if (!expanded)
+                break;
+        if (ft_strncmp(expanded, redir->filename, ft_strlen(redir->filename) + 1) == 0)
         {
-            free(line);
+            free(expanded);
             break ;
         }
-        write(fd_pipe[1], line, ft_strlen(line));
+        write(fd_pipe[1], expanded, ft_strlen(expanded));
         write(fd_pipe[1], "\n" , 1);
-        free(line);
+        free(expanded);
+        
     }
     close(fd_pipe[1]);
     redir->fd = fd_pipe[0];
 }
 
-void    heredoc_preparation(t_cmd *cmds)
+void    heredoc_preparation(t_cmd *cmds, t_shell *shell)
 {
     t_cmd   *tmp;
     t_redir *redir;
+    char    *expanded;
 
     tmp = cmds;
     while (tmp)
@@ -41,7 +51,14 @@ void    heredoc_preparation(t_cmd *cmds)
         while (redir)
         {
             if(redir->type == REDIR_HEREDOC)
-                prepare_reading_pipe(redir);
+            {
+                expanded = expansion_string(redir->filename, shell);
+                if (!expanded)
+                    return ;
+                free(redir->filename);
+                redir->filename = expanded;
+                prepare_reading_pipe(redir, shell);
+            }
             redir = redir->next;
         }
         tmp = tmp->next;
