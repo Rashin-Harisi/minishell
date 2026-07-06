@@ -19,7 +19,7 @@ void    prepare_reading_pipe(t_redir *redir, t_shell *shell)
         if (!line) break ;
         if (ft_strncmp(line, redir->filename, ft_strlen(redir->filename) + 1) == 0)
         {
-            free(expanded);
+            free(line);
             break ;
         }
         if (!redir->quoted)

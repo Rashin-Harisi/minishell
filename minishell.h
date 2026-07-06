@@ -81,6 +81,7 @@ typedef struct s_token
 {
     char            *value;
     t_token_type   type;
+    int            quoted;
     struct s_token  *next;
 } t_token;
 
@@ -156,6 +157,7 @@ char    *expand_var(char *str, int *i, t_shell *shell, char *expanded);
 char    *expansion_string(char *str, t_shell *shell);
 int     expansion_args(char **args, t_shell *shell);
 int     expansion_redir(t_redir *redir, t_shell *shell);
+int expansion_tokens(t_token *tokens, t_shell *shell);
 // HEARDOC_PREPRARTION's functions
 void    heredoc_preparation(t_cmd *cmds, t_shell *shell);
 // BUILTIN's functions 

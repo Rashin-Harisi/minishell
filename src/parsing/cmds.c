@@ -21,6 +21,11 @@ t_cmd *init_cmds(t_token **tokens)
     {
         if( (*tokens)->type == TOKEN_WORD)
         {
+            if ((*tokens)->value && (*tokens)->value[0] == '\0' && !(*tokens)->quoted)
+            {
+                (*tokens) = (*tokens)->next;
+                continue;
+            }
             cmd->args[i] = ft_strdup((*tokens)->value);
             if (!cmd->args[i]) return(free_one_cmd(cmd), NULL);
             i++;

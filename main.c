@@ -100,6 +100,12 @@ int main(int argc, char **argv, char **envp)
 			rl_on_new_line();
 			continue;
 		}
+		if (expansion_tokens(tokens, &shell))
+		{
+			shell.exit_status = 1;
+			free_iteration(tokens, shell.cmds, shell.line);
+			continue;
+		}
 		shell.cmds = create_cmds(tokens);
 		if (!shell.cmds)
 		{
@@ -114,7 +120,7 @@ int main(int argc, char **argv, char **envp)
 			free_iteration(tokens, shell.cmds, shell.line);
 			continue;
 		}
-		remove_empty_args(shell.cmds->args);
+		//remove_empty_args(shell.cmds->args);
 		print_cmds(shell.cmds);
 		heredoc_preparation(shell.cmds, &shell);
 		free_paths(paths);

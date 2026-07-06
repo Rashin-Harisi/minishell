@@ -4,7 +4,12 @@ int special_command_check(t_cmd *cmd, t_shell *shell)
 {
     if (!cmd || !cmd->args || !cmd->args[0])
         return (0);
-
+    if (cmd->args[0][0] == '\0')
+    {
+        ft_putstr_fd("'' : command not found\n", 2);
+        shell->exit_status = 127;
+        return (1);
+    }
     if (ft_strncmp(cmd->args[0], ".", 2) == 0)
     {
         ft_putstr_fd(".: command not found\n", 2);
@@ -33,7 +38,7 @@ int special_command_check_all(t_cmd *cmds, t_shell *shell)
 
 int execution(t_shell *shell, t_token **tokens, char **paths)
 {
-    if (special_command_check(shell->cmds, shell))
+    if (special_command_check_all(shell->cmds, shell))
         return (shell->exit_status);
     //if (check_redirection(shell->cmds))
     //   return (1);

@@ -188,7 +188,10 @@ int count_args(t_token *tokens)
             continue;
         }
         if (tmp->type == TOKEN_WORD)
-            count++;
+        {
+            if (tmp->value && (tmp->value[0] != '\0' || tmp->quoted))
+                count++;
+        }
         tmp = tmp->next;
     }
     return (count);

@@ -2,7 +2,23 @@
 
 t_token    *init_token(char *tmp, t_token *node)
 {
+    int i;
+
     node->value = tmp;
+    node->quoted = 0;
+    if (tmp)
+    {
+        i = 0;
+        while (tmp[i])
+        {
+            if (tmp[i] == '\'' || tmp[i] == '"')
+            {
+                node->quoted = 1;
+                break;
+            }
+            i++;
+        }
+    }
     if (tmp[0] == '>' && tmp[1] == '>' && tmp[2] == '\0')
         node->type = TOKEN_APPEND;
     else if (tmp[0] == '<' && tmp[1] == '<' && tmp[2] == '\0')
