@@ -7,6 +7,29 @@ static void free_iteration(t_token *tokens, t_cmd *cmds, char *line)
 	if (line) free(line);
 }
 
+void remove_empty_args(char **args)
+{
+    int i;
+    int j;
+
+    if (!args)
+        return ;
+    i = 0;
+    j = 0;
+    while (args[i])
+    {
+        if (args[i][0] != '\0')
+        {
+            args[j] = args[i];
+            j++;
+        }
+        else
+            free(args[i]);
+        i++;
+    }
+    args[j] = NULL;
+}
+
 int main(int argc, char **argv, char **envp)
 {
 	t_shell shell;
@@ -66,7 +89,7 @@ int main(int argc, char **argv, char **envp)
 			rl_on_new_line();
 			continue;
 		}
-		//print_tokens(tokens);
+		print_tokens(tokens);
 		if (syntax_check(tokens, &shell))
 		{
 			ft_putstr_fd("syntax error near unexpected token `", STDERR_FILENO);
@@ -91,7 +114,8 @@ int main(int argc, char **argv, char **envp)
 			free_iteration(tokens, shell.cmds, shell.line);
 			continue;
 		}
-		//print_cmds(shell.cmds);
+		remove_empty_args(shell.cmds->args);
+		print_cmds(shell.cmds);
 		heredoc_preparation(shell.cmds, &shell);
 		free_paths(paths);
 		paths = get_paths(shell.env);
@@ -100,7 +124,8 @@ int main(int argc, char **argv, char **envp)
 		if (ret == 2) break;
 		if (ret == 1) continue;
 	}
-	free_paths(paths);
+	if (paths)
+		free_paths(paths);
 	free_envs(shell.env);
 	//clear_history();
 	rl_clear_history();
