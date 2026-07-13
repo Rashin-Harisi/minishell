@@ -64,6 +64,26 @@ int execute_external_command(t_cmd *cmd, char **paths, t_shell *shell)
     return (0);
 }
 
+static int	restore_standard_fds(int saved_stdin, int saved_stdout)
+{
+	int	error;
+
+	error = 0;
+	if (dup2(saved_stdin, STDIN_FILENO) == -1)
+	{
+		perror("dup2 stdin");
+		error = 1;
+	}
+	if (dup2(saved_stdout, STDOUT_FILENO) == -1)
+	{
+		perror("dup2 stdout");
+		error = 1;
+	}
+	close(saved_stdin);
+	close(saved_stdout);
+	return (error);
+}
+
 int builtin_with_redirection(t_shell *shell, t_token **tokens)
 {
     t_cmd   *cmd;
@@ -85,28 +105,16 @@ int builtin_with_redirection(t_shell *shell, t_token **tokens)
     cmd = shell->cmds;
     if (apply_redirection(cmd->redirects))
     {
-        if (dup2(saved_stdin, STDIN_FILENO) == -1 || dup2(saved_stdout, STDOUT_FILENO) == -1)
-        {
-            perror("dup2");
-            shell->exit_status = 1;
-            close(saved_stdin);
-            close(saved_stdout);
-            return (1);
-        }
-        close(saved_stdin);
-        close(saved_stdout);
+        restore_standard_fds(saved_stdin, saved_stdout);
         shell->exit_status = 1;
         return (1);
     }
     ret = builtin_functions(shell, tokens);
-    if (dup2(saved_stdin, STDIN_FILENO) == -1 || dup2(saved_stdout, STDOUT_FILENO) == -1)
+    if (restore_standard_fds(saved_stdin, saved_stdout))
     {
-        perror("dup2");
         shell->exit_status = 1;
         ret = 1;
     }
-    close(saved_stdin);
-    close(saved_stdout);
     return (ret);
 }
 
@@ -117,7 +125,11 @@ int execute_single_command(t_shell *shell, char **paths, t_token **tokens)
     cmds = shell->cmds;
     if (!cmds->args || !cmds->args[0]) return (only_redirection(cmds, shell));
     if (is_builtin(cmds->args))
-        return builtin_with_redirection(shell, tokens);
+    {
+        if (cmds->redirects)
+            return (builtin_with_redirection(shell, tokens));
+        return (builtin_functions(shell, tokens));
+    }
     else
-        return execute_external_command(cmds, paths, shell);
+        return (execute_external_command(cmds, paths, shell));
 }
