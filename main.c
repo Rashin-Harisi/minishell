@@ -89,7 +89,7 @@ int main(int argc, char **argv, char **envp)
 			rl_on_new_line();
 			continue;
 		}
-		print_tokens(tokens);
+		//print_tokens(tokens);
 		if (syntax_check(tokens, &shell))
 		{
 			ft_putstr_fd("syntax error near unexpected token `", STDERR_FILENO);
@@ -114,6 +114,7 @@ int main(int argc, char **argv, char **envp)
 			free_iteration(tokens, shell.cmds, shell.line);
 			continue;
 		}
+		
 		if (expansion(&shell))
 		{
 			shell.exit_status = 1;
@@ -121,7 +122,7 @@ int main(int argc, char **argv, char **envp)
 			continue;
 		}
 		//remove_empty_args(shell.cmds->args);
-		print_cmds(shell.cmds);
+		//print_cmds(shell.cmds);
 		heredoc_preparation(shell.cmds, &shell);
 		free_paths(paths);
 		paths = get_paths(shell.env);
@@ -133,7 +134,9 @@ int main(int argc, char **argv, char **envp)
 	if (paths)
 		free_paths(paths);
 	free_envs(shell.env);
-	//clear_history();
 	rl_clear_history();
+	//clear_history();
+	//rl_free_line_state();
+	//rl_cleanup_after_signal();
 	return (shell.exit_status);
 }

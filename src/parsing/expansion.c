@@ -71,7 +71,7 @@ int    expansion(t_shell *shell)
     cmds = shell->cmds;
     while (cmds)
     {
-        if (expansion_args(cmds->args, shell)) return (1);
+        //if (expansion_args(cmds->args, shell)) return (1);
         if (expansion_redir(cmds->redirects, shell)) return (1);
         cmds = cmds->next;
     }
