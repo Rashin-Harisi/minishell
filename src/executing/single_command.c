@@ -1,5 +1,42 @@
 #include "minishell.h"
 
+
+int wait_for_pid(pid_t pid, int *status)
+{
+    pid_t result;
+
+    while(1)
+    {
+        result = waitpid(pid, status, 0);
+        if (result == pid)
+            return (0);
+        if (result == -1 && errno == EINTR)
+            continue;
+        if (result == -1)
+        {
+            perror("waitpid");
+            return (1);
+        }
+    }
+}
+
+void set_wait_status(t_shell *shell, int status)
+{
+    int sig;
+
+    if (WIFEXITED(status))
+        shell->exit_status = WEXITSTATUS(status);
+    else if (WIFSIGNALED(status))
+    {
+        sig = WTERMSIG(status);
+        shell->exit_status = 128 + sig;
+        if (sig == SIGINT)
+            write(STDOUT_FILENO, "\n", 1);
+        else if (sig == SIGQUIT)
+            write(STDERR_FILENO, "Quit (core dumped)\n", 19);
+    }
+}
+
 int execute_external_command(t_cmd *cmd, char **paths, t_shell *shell)
 {
     char *pathname;
@@ -11,16 +48,19 @@ int execute_external_command(t_cmd *cmd, char **paths, t_shell *shell)
     pathname = check_access_pathname(paths, cmd->args[0], shell);
     if (!pathname)
         return (1);
+    set_parent_wait_signals();
     pid = fork();
     if (pid == -1)
     {
         perror("fork");
+        set_prompt_signals();
         free(pathname);
         shell->exit_status = 1;
         return (1);
     }
     if (pid == 0)
     {
+        set_child_signals();
         if (apply_redirection(cmd->redirects))
         {
             free(pathname);
@@ -52,14 +92,15 @@ int execute_external_command(t_cmd *cmd, char **paths, t_shell *shell)
         free_paths(paths);
         exit(126);
     }
-    else
+    if (wait_for_pid(pid, &status))
     {
-        waitpid(pid, &status, 0);
-        if (WIFEXITED(status))
-            shell->exit_status = WEXITSTATUS(status);
-        else if (WIFSIGNALED(status))
-            shell->exit_status = 128 + WTERMSIG(status);
+        shell->exit_status = 1;
+        set_prompt_signals();
+        free(pathname);
+        return (1);
     }
+    set_wait_status(shell, status);
+    set_prompt_signals();
     free(pathname);
     return (0);
 }

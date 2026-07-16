@@ -54,7 +54,7 @@ int main(int argc, char **argv, char **envp)
 	{
 		tokens = NULL;
 		shell.cmds = NULL;
-		init_signals();
+		set_prompt_signals();
 		if (shell.interactive)
 		{
 			prompt = create_prompt(&shell);

@@ -20,6 +20,11 @@
 # include <linux/limits.h>
 # include "libft/libft.h"
 
+/*===================Global Variable==================== */
+extern volatile sig_atomic_t	g_signal; 
+//the variable is defined in another file and it is just clarified here : extern
+// volatile say to compiler that this variable might be changed outof normal flow of the program
+// so the value of this shoule not cache from previous assumptions
 /*======================Forward Declaration=============*/
 typedef struct s_env t_env;
 typedef struct s_cmd t_cmd;
@@ -127,7 +132,9 @@ void	free_paths(char **paths);
 // PROMPT's functions
 char    *create_prompt(t_shell *shell);
 // SIGNAL's functions
-void    init_signals(void);
+void set_prompt_signals(void);
+void set_parent_wait_signals(void);
+void set_child_signals(void);
 // TOKENS' functions
 void    free_tokens(t_token *tokens);
 void	ft_lstadd_back_token(t_token **token, t_token *new);
@@ -197,5 +204,6 @@ int     execute_external_command(t_cmd *cmd, char **paths, t_shell *shell);
 int     builtin_with_redirection(t_shell *shell, t_token **tokens);
 int     execute_single_command(t_shell *shell, char **paths, t_token **tokens);
 int     execute_pipeline(t_shell *shell, char **paths, t_token **tokens);
-
+int wait_for_pid(pid_t pid, int *status);
+void set_wait_status(t_shell *shell, int status);
 #endif
