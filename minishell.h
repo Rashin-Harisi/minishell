@@ -71,6 +71,7 @@ typedef struct s_shell
     char    *syntax_check;
     int     in_pipe;
     int     exit_status;
+    int     heredoc_index;
     int     interactive; // terminal or script =>isatty(STDIN_FILEN)
 } t_shell;
 
@@ -166,7 +167,7 @@ int     expansion_args(char **args, t_shell *shell);
 int     expansion_redir(t_redir *redir, t_shell *shell);
 int expansion_tokens(t_token *tokens, t_shell *shell);
 // HEARDOC_PREPRARTION's functions
-void    heredoc_preparation(t_cmd *cmds, t_shell *shell);
+int    heredoc_preparation(t_cmd *cmds, t_shell *shell);
 // BUILTIN's functions 
 int     builtin_functions(t_shell *shell, t_token **tokens);
 int     builtin_update_env(t_shell *shell, t_cmd *cmd);
@@ -206,4 +207,5 @@ int     execute_single_command(t_shell *shell, char **paths, t_token **tokens);
 int     execute_pipeline(t_shell *shell, char **paths, t_token **tokens);
 int wait_for_pid(pid_t pid, int *status);
 void set_wait_status(t_shell *shell, int status);
+
 #endif

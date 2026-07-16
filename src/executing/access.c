@@ -9,21 +9,34 @@ int is_directory(char *path)
     return (S_ISDIR(st.st_mode));
 }
 
+void print_error(char *s1, char *s2)
+{
+    char *msg;
+
+    msg = ft_strjoin(s1, s2);
+    if (!msg)
+        return;
+    write(STDERR_FILENO, msg, ft_strlen(msg));
+    free(msg);
+}
+
 char *check_access_pathname(char **paths, char *cmd, t_shell *shell)
 {
     int i;
     char *temp;
     char *pathname;
+    int fount_not_executable;
+
 
     i = 0;
+    fount_not_executable = 0;
     if (!cmd || !cmd[0]) return (NULL);
     if (ft_strchr(cmd, '/'))
     {
         if (is_directory(cmd))
         {
-            ft_putstr_fd(cmd,2);
-            ft_putstr_fd(": Is a directory\n", 2);
             shell->exit_status = 126;
+            print_error(cmd, ": Is a directory\n");
             return (NULL);
         }
         if (access(cmd, F_OK) != 0)
@@ -38,13 +51,15 @@ char *check_access_pathname(char **paths, char *cmd, t_shell *shell)
             shell->exit_status = 126;
             return (NULL);
         }
-        return (ft_strdup(cmd));
+        pathname = ft_strdup(cmd);
+        if (!pathname)
+            shell->exit_status = 1;
+        return (pathname);
     }
     if (!paths)
     {
         shell->exit_status = 127;
-        ft_putstr_fd(cmd ,2);
-        ft_putstr_fd(": command not found\n",2);
+        print_error(cmd, ": command not found\n");
         return (NULL);
     }
     while (paths[i])
@@ -58,22 +73,27 @@ char *check_access_pathname(char **paths, char *cmd, t_shell *shell)
         {
             if (is_directory(pathname))
             {
-                ft_putstr_fd(cmd, 2);
-                ft_putstr_fd(": Is a directory\n", 2);
-                shell->exit_status = 126;
-                return (free(pathname), NULL);
+                fount_not_executable = 1;
+                free(pathname);
+                i++;
+                continue;
             }
             if (access(pathname, X_OK) == 0)
                 return (pathname);
-            perror(cmd);
-            shell->exit_status = 126;
-            return (free(pathname), NULL);
+            fount_not_executable = 1;
         }
         free(pathname);
         i++;
     }
-    shell->exit_status = 127;
-    ft_putstr_fd(cmd, 2);
-    ft_putstr_fd(": command not found\n",2);
+    if (fount_not_executable)
+    {
+        shell->exit_status = 126;
+        print_error(cmd, ": Permission denied\n");
+    }
+    else
+    {
+        shell->exit_status = 127;
+        print_error(cmd, ": command not found\n");
+    }
     return (NULL);
 }

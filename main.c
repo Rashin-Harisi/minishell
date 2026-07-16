@@ -123,7 +123,12 @@ int main(int argc, char **argv, char **envp)
 		}
 		//remove_empty_args(shell.cmds->args);
 		//print_cmds(shell.cmds);
-		heredoc_preparation(shell.cmds, &shell);
+		if (heredoc_preparation(shell.cmds, &shell))
+		{
+			shell.exit_status = 1;
+			free_iteration(tokens, shell.cmds, shell.line);
+			continue;
+		}
 		free_paths(paths);
 		paths = get_paths(shell.env);
 		ret = execution(&shell, &tokens, paths);
