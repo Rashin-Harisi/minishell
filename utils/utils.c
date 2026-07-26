@@ -1,17 +1,15 @@
+/* ************************************************************************** */
+/*																			  */
+/*														  :::	   ::::::::   */
+/*	 utils.c											:+:		 :+:	:+:   */
+/*													  +:+ +:+		  +:+	  */
+/*	 By: rabdolho <rabdolho@student.42vienna.com>	+#+  +:+	   +#+		  */
+/*												  +#+#+#+#+#+	+#+			  */
+/*	 Created: 2026/07/26 20:00:56 by rabdolho		   #+#	  #+#			  */
+/*	 Updated: 2026/07/26 20:00:56 by rabdolho		  ###	########.fr		  */
+/*																			  */
+/* ************************************************************************** */
 #include "minishell.h"
-
-void	print_envs(t_env *env)
-{
-	t_env *tmp;
-
-    tmp = env;
-    while (tmp)
-    {
-        if (tmp->has_equal)
-            printf("%s=%s\n", tmp->key, tmp->value);
-        tmp = tmp->next;
-    }
-}
 
 char	*get_token_type_name(t_token_type type)
 {
@@ -30,46 +28,9 @@ char	*get_token_type_name(t_token_type type)
 	return ("UNKNOWN");
 }
 
-void	print_tokens(t_token *tokens)
-{
-	if (!tokens) return ;
-	printf("======== TOKENS =========\n");
-
-	while (tokens)
-	{
-		printf("VALUE : [%s]\n",
-			tokens->value ? tokens->value : "(null)");
-
-		printf("TYPE  : %s\n",
-			get_token_type_name(tokens->type));
-
-		printf("-------------------------\n");
-
-		tokens = tokens->next;
-	}
-}
-
-void	print_paths(char **paths)
-{
-	int	i;
-
-	i = 0;
-	printf("========== PATHS ==========\n");
-	if (!paths)
-	{
-		printf("(null)\n");
-		return ;
-	}
-	while (paths[i])
-	{
-		printf("paths[%d] = [%s]\n", i, paths[i]);
-		i++;
-	}
-}
-
 int	is_empty_line(char *line)
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (line[i])
@@ -79,58 +40,4 @@ int	is_empty_line(char *line)
 		i++;
 	}
 	return (1);
-}
-
-void	print_redirs(t_redir *redir)
-{
-	while (redir)
-	{
-		printf("    redir type: ");
-
-		if (redir->type == REDIR_IN)
-			printf("REDIR_IN");
-		else if (redir->type == REDIR_OUT)
-			printf("REDIR_OUT");
-		else if (redir->type == REDIR_APPEND)
-			printf("REDIR_APPEND");
-		else if (redir->type == REDIR_HEREDOC)
-			printf("REDIR_HEREDOC");
-
-		printf("\n");
-
-		printf("    filename: %s\n", redir->filename);
-
-		redir = redir->next;
-	}
-}
-
-void	print_cmds(t_cmd *cmds)
-{
-	int	i;
-	int	cmd_num;
-
-	i = 0;
-	cmd_num = 1;
-
-	while (cmds)
-	{
-		printf("========== CMD %d ==========\n", cmd_num);
-
-		printf("ARGS:\n");
-
-		i = 0;
-		while (cmds->args && cmds->args[i])
-		{
-			printf("    args[%d] = %s\n", i, cmds->args[i]);
-			i++;
-		}
-
-		printf("REDIRECTIONS:\n");
-		print_redirs(cmds->redirects);
-
-		printf("\n");
-
-		cmds = cmds->next;
-		cmd_num++;
-	}
 }
