@@ -1,113 +1,131 @@
+/* ************************************************************************** */
+/*																			  */
+/*														  :::	   ::::::::   */
+/*	 helpers_expansion.c								:+:		 :+:	:+:   */
+/*													  +:+ +:+		  +:+	  */
+/*	 By: rabdolho <rabdolho@student.42vienna.com>	+#+  +:+	   +#+		  */
+/*												  +#+#+#+#+#+	+#+			  */
+/*	 Created: 2026/07/27 11:35:09 by rabdolho		   #+#	  #+#			  */
+/*	 Updated: 2026/07/27 11:35:09 by rabdolho		  ###	########.fr		  */
+/*																			  */
+/* ************************************************************************** */
 #include "minishell.h"
 
-int is_specific_char(char s)
+int	is_specific_char(char s)
 {
-    if ((s >= 'a' && s <= 'z')
-        || (s>= 'A' && s <= 'Z')
-        || (s >= '0' && s <= '9')
-        || s == '_')
-        return (1);
-    else
-        return (0);
+	if ((s >= 'a' && s <= 'z')
+		|| (s >= 'A' && s <= 'Z')
+		|| (s >= '0' && s <= '9')
+		|| s == '_')
+		return (1);
+	else
+		return (0);
 }
 
-char *find_var_value(char *var, t_env *envs)
+char	*find_var_value(char *var, t_env *envs)
 {
-    while (envs)
-    {
-        if (ft_strncmp(var, envs->key, ft_strlen(var)+1) == 0)
-            return (envs->value);
-        envs = envs->next;
-    }
-    return (NULL);
+	while (envs)
+	{
+		if (ft_strncmp(var, envs->key, ft_strlen(var) + 1) == 0)
+			return (envs->value);
+		envs = envs->next;
+	}
+	return (NULL);
 }
 
-char    *append_str(char *str, char *s)
+char	*append_str(char *str, char *s)
 {
-    char    *new;
-    if (!s)
-        s = "";
-    new = ft_strjoin(str, s);
-    free(str);
-    return(new);
+	char	*new;
+
+	if (!s)
+		s = "";
+	new = ft_strjoin(str, s);
+	free(str);
+	return (new);
 }
 
-char    *append_char(char *str, char s)
+char	*append_char(char *str, char s)
 {
-    char new[2];
+	char	new[2];
 
-    new[0] = s;
-    new[1] = '\0';
-    return (append_str(str, new));
+	new[0] = s;
+	new[1] = '\0';
+	return (append_str(str, new));
 }
 
-char    *expand_var(char *str, int *i, t_shell *shell, char *expanded)
+char	*expand_var(char *str, int *i, t_shell *shell, char *expanded)
 {
-    int     start;
-    char    *var;
-    char    *value;
-    char    *status;
+	int		start;
+	char	*var;
+	char	*value;
+	char	*status;
 
-    (*i)++;
-    if (str[*i] == '?')
-    {
-        (*i)++;
-        status = ft_itoa(shell->exit_status);
-        if (!status) return (free(expanded), NULL);
-        expanded = append_str(expanded,status);
-        free(status);
-        return (expanded);
-    }
-    start = *i;
-    while (str[*i] && is_specific_char(str[*i]))
-        (*i)++;
-    if (*i == start)
-        return (append_char(expanded, '$'));
-    var = ft_substr(str, start, (*i) - start);
-    if (!var) return (free(expanded),NULL);
-    value = find_var_value(var, shell->env);
-    free(var);
-    if (value)
-        return (append_str(expanded, value));
-    return (expanded); 
+	(*i)++;
+	if (str[*i] == '?')
+	{
+		(*i)++;
+		status = ft_itoa(shell->exit_status);
+		if (!status)
+			return (free(expanded), NULL);
+		expanded = append_str(expanded, status);
+		free(status);
+		return (expanded);
+	}
+	start = *i;
+	while (str[*i] && is_specific_char(str[*i]))
+		(*i)++;
+	if (*i == start)
+		return (append_char(expanded, '$'));
+	var = ft_substr(str, start, (*i) - start);
+	if (!var)
+		return (free(expanded), NULL);
+	value = find_var_value(var, shell->env);
+	free(var);
+	if (value)
+		return (append_str(expanded, value));
+	return (expanded);
 }
 
-char    *expansion_string(char *str, t_shell *shell)
+char	*expansion_string(char *str, t_shell *shell)
 {
-    int     i;
-    int     single_quote;
-    int     double_quote;
-    char    *expanded;
-    
-    if (!str) return (NULL);
-    i = 0;
-    single_quote = 0;
-    double_quote = 0;
-    expanded = ft_strdup("");
-    if (!expanded) return (NULL);
-    while (str[i])
-    {
-        if (str[i] == '\'' && !double_quote)
-        {
-            single_quote = !single_quote;
-            i++;
-            continue;
-        }
-        if (str[i] == '"' && !single_quote)
-        {
-            double_quote = !double_quote;
-            i++;
-            continue;
-        }
-        if (str[i] == '$' && !single_quote)
-        {
-            expanded = expand_var(str, &i, shell, expanded);
-            if (!expanded) return (NULL);
-            continue;
-        }
-        expanded = append_char(expanded, str[i]);
-        if (!expanded) return (NULL);
-        i++;        
-    }
-    return (expanded);
+	int		i;
+	int		single_quote;
+	int		double_quote;
+	char	*expanded;
+
+	if (!str)
+		return (NULL);
+	i = 0;
+	single_quote = 0;
+	double_quote = 0;
+	expanded = ft_strdup("");
+	if (!expanded)
+		return (NULL);
+	while (str[i])
+	{
+		if (str[i] == '\'' && !double_quote)
+		{
+			single_quote = !single_quote;
+			i++;
+			continue ;
+		}
+		if (str[i] == '"' && !single_quote)
+		{
+			double_quote = !double_quote;
+			i++;
+			continue ;
+		}
+		if (str[i] == '$' && !single_quote)
+		{
+			expanded = expand_var(str, &i, shell, expanded);
+			if (!expanded)
+				return (NULL);
+			continue ;
+		}
+		expanded = append_char(expanded, str[i]);
+		if (!expanded)
+			return (NULL);
+		i++;
+	}
+	return (expanded);
 }
