@@ -151,7 +151,7 @@ typedef struct s_pipeline
 }	t_pipeline;
 
 # ifndef BUFFER_SIZE
-# define BUFFER_SIZE 42
+#  define BUFFER_SIZE 42
 # endif
 
 /*=================functions====================*/
@@ -374,7 +374,6 @@ int				add_token(t_token **tokens, char *value);
 int				fill_tokens(char *line, t_token **tokens, int *syntax_error);
 t_token			*create_tokens(char *line);
 void			skip_spaces(char *line, int *index);
-
 
 /*=================End========================= */
 #endif

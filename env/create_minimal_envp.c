@@ -19,10 +19,13 @@ t_env	*create_env_node(char *key, char *value)
 	if (!node)
 		return (NULL);
 	node->key = ft_strdup(key);
-	node->value = ft_strdup(value);
+	if (value)
+		node->value = ft_strdup(value);
+	else
+		node->value = NULL;
 	node->next = NULL;
 	node->has_equal = 1;
-	if (!node->key || !node->value)
+	if (!node->key || (value && !node->value))
 	{
 		free(node->key);
 		free(node->value);
