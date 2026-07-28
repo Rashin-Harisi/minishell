@@ -11,27 +11,59 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-char	*create_name(int index)
+int	read_heredoc(int fd, t_redir *redir, t_shell *shell)
 {
-	char	*number;
-	char	*filename;
+	char	*line;
 
-	number = ft_itoa(index);
-	if (!number)
-		return (NULL);
-	filename = ft_strjoin(".heredoc_", number);
-	free(number);
-	if (!filename)
-		return (NULL);
-	return (filename);
+	while (1)
+	{
+		line = readline("heredoc> ");
+		if (!line)
+			return (0);
+		if (!ft_strncmp(line, redir->filename,
+				ft_strlen(redir->filename) + 1))
+			return (free(line), 0);
+		line = expand_heredoc_line(line, redir, shell);
+		if (!line)
+			return (1);
+		if (write_heredoc_line(fd, line))
+			return (perror("heredoc"), free(line), 1);
+		free(line);
+	}
+}
+
+int	open_heredoc_file(char *filename)
+{
+	int	fd;
+
+	fd = open(filename, O_RDONLY);
+	if (fd == -1)
+		perror("heredoc");
+	return (fd);
+}
+
+int	finish_heredoc(t_redir *redir, int fd, char *filename)
+{
+	if (close(fd) == -1)
+	{
+		perror("heredoc");
+		return (heredoc_error(-1, filename));
+	}
+	fd = open_heredoc_file(filename);
+	if (fd == -1)
+		return (heredoc_error(-1, filename));
+	unlink(filename);
+	free(filename);
+	if (redir->fd != -1)
+		close(redir->fd);
+	redir->fd = fd;
+	return (0);
 }
 
 int	prepare_reading_file(t_redir *redir, t_shell *shell)
 {
-	char	*line;
-	int		fd;
-	char	*expanded;
 	char	*filename;
+	int		fd;
 
 	filename = create_name(shell->heredoc_index++);
 	if (!filename)
@@ -43,62 +75,9 @@ int	prepare_reading_file(t_redir *redir, t_shell *shell)
 		free(filename);
 		return (1);
 	}
-	while (1)
-	{
-		line = readline("heredoc> ");
-		if (!line)
-			break ;
-		if (ft_strncmp(line, redir->filename,
-				ft_strlen(redir->filename) + 1) == 0)
-		{
-			free(line);
-			break ;
-		}
-		if (!redir->quoted)
-		{
-			expanded = expansion_string(line, shell);
-			free(line);
-			line = expanded;
-			if (!line)
-			{
-				close(fd);
-				unlink(filename);
-				free(filename);
-				return (1);
-			}
-		}
-		if (write(fd, line, ft_strlen(line)) == -1 || write(fd, "\n", 1) == -1)
-		{
-			perror("heredoc");
-			free(line);
-			close(fd);
-			unlink(filename);
-			free(filename);
-			return (1);
-		}
-		free(line);
-	}
-	if (close(fd) == -1)
-	{
-		perror("heredoc");
-		unlink(filename);
-		free(filename);
-		return (1);
-	}
-	fd = open(filename, O_RDONLY);
-	if (fd == -1)
-	{
-		perror("heredoc");
-		unlink(filename);
-		free(filename);
-		return (1);
-	}
-	unlink(filename);
-	free(filename);
-	if (redir->fd != -1)
-		close(redir->fd);
-	redir->fd = fd;
-	return (0);
+	if (read_heredoc(fd, redir, shell))
+		return (heredoc_error(fd, filename));
+	return (finish_heredoc(redir, fd, filename));
 }
 
 int	heredoc_preparation(t_cmd *cmds, t_shell *shell)

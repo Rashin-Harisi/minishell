@@ -128,6 +128,28 @@ typedef struct s_main
 	char	**paths;
 }	t_main;
 
+typedef struct s_export
+{
+	t_env	*node;
+	char	*key;
+	char	*value;
+	int		has_equal;
+	int		status;
+}	t_export;
+
+typedef struct s_pipeline
+{
+	int		pipefd[2];
+	int		prev_fd;
+	int		status;
+	int		count;
+	int		index;
+	pid_t	*pids;
+	char	**envp;
+	char	**paths;
+	t_cmd	*cmd;
+}	t_pipeline;
+
 # ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42
 # endif

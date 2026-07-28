@@ -55,33 +55,38 @@ int	calculate_nodes(t_env *env)
 	return (i);
 }
 
+char	*create_env_line(t_env *env)
+{
+	char	*key_equal;
+	char	*line;
+
+	key_equal = ft_strjoin(env->key, "=");
+	if (!key_equal)
+		return (NULL);
+	line = ft_strjoin(key_equal, env->value);
+	free(key_equal);
+	return (line);
+}
+
 char	**convert_list_to_array(t_env *env)
 {
 	char	**envp;
-	t_env	*tmp;
 	int		i;
-	char	*line;
 
-	i = 0;
-	envp = ft_calloc((calculate_nodes(env) + 1), sizeof(char *));
+	envp = ft_calloc(calculate_nodes(env) + 1, sizeof(char *));
 	if (!envp)
 		return (NULL);
-	tmp = env;
-	while (tmp)
+	i = 0;
+	while (env)
 	{
-		if (tmp->has_equal)
+		if (env->has_equal)
 		{
-			line = ft_strjoin(tmp->key, "=");
-			if (!line)
-				return (free_array(envp), NULL);
-			envp[i] = ft_strjoin(line, tmp->value);
-			free(line);
+			envp[i] = create_env_line(env);
 			if (!envp[i])
 				return (free_array(envp), NULL);
 			i++;
 		}
-		tmp = tmp->next;
+		env = env->next;
 	}
-	envp[i] = NULL;
 	return (envp);
 }

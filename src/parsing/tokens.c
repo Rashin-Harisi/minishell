@@ -11,100 +11,56 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-t_token	*init_token(char *tmp, t_token *node)
+t_token	*create_token_node(char *value)
 {
-	int	i;
+	t_token	*node;
 
-	node->value = tmp;
-	node->quoted = 0;
-	if (tmp)
-	{
-		i = 0;
-		while (tmp[i])
-		{
-			if (tmp[i] == '\'' || tmp[i] == '"')
-			{
-				node->quoted = 1;
-				break ;
-			}
-			i++;
-		}
-	}
-	if (tmp[0] == '>' && tmp[1] == '>' && tmp[2] == '\0')
-		node->type = TOKEN_APPEND;
-	else if (tmp[0] == '<' && tmp[1] == '<' && tmp[2] == '\0')
-		node->type = TOKEN_HEREDOC;
-	else if (tmp[0] == '<' && tmp[1] == '\0')
-		node->type = TOKEN_REDIR_IN;
-	else if (tmp[0] == '>' && tmp[1] == '\0')
-		node->type = TOKEN_REDIR_OUT;
-	else if (tmp[0] == '|' && tmp[1] == '\0')
-		node->type = TOKEN_PIPE;
-	else
-		node->type = TOKEN_WORD;
-	node->next = NULL;
-	return (node);
+	node = malloc(sizeof(t_token));
+	if (!node)
+		return (NULL);
+	return (init_token(value, node));
 }
 
-void	ft_lstadd_back_token(t_token **token, t_token *new)
+int	add_token(t_token **tokens, char *value)
 {
-	t_token	*current;
+	t_token	*node;
 
-	if (!token || !new)
-		return ;
-	if (*token == NULL)
-		*token = new;
-	else
+	node = create_token_node(value);
+	if (!node)
 	{
-		current = *token;
-		while (current->next != NULL)
-			current = current->next;
-		current->next = new;
+		free(value);
+		return (1);
 	}
+	ft_lstadd_back_token(tokens, node);
+	return (0);
 }
 
-void	free_tokens(t_token *tokens)
+int	fill_tokens(char *line, t_token **tokens, int *syntax_error)
 {
-	t_token	*tmp;
+	char	*tmp;
+	int		index;
 
-	while (tokens)
+	index = 0;
+	tmp = each_part_extract(line, &index, syntax_error);
+	while (tmp && !*syntax_error)
 	{
-		tmp = tokens->next;
-		free(tokens->value);
-		free(tokens);
-		tokens = tmp;
+		if (add_token(tokens, tmp))
+			return (1);
+		tmp = each_part_extract(line, &index, syntax_error);
 	}
+	return (0);
 }
 
 t_token	*create_tokens(char *line)
 {
 	t_token	*tokens;
-	t_token	*node;
-	char	*tmp;
-	int		i;
 	int		syntax_error;
 
-	syntax_error = 0;
-	i = 0;
 	tokens = NULL;
-	tmp = each_part_extract(line, &i, &syntax_error);
-	while (tmp != NULL && !syntax_error)
-	{
-		node = malloc(sizeof(t_token));
-		if (!node)
-		{
-			free(tmp);
-			free_tokens(tokens);
-			return (NULL);
-		}
-		init_token(tmp, node);
-		ft_lstadd_back_token(&tokens, node);
-		tmp = each_part_extract(line, &i, &syntax_error);
-	}
+	syntax_error = 0;
+	if (fill_tokens(line, &tokens, &syntax_error))
+		return (free_tokens(tokens), NULL);
 	if (syntax_error)
-	{
-		free_tokens(tokens);
-		return (NULL);
-	}
+		return (free_tokens(tokens), NULL);
 	return (tokens);
 }

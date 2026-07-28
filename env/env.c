@@ -68,6 +68,25 @@ void	free_envs(t_env *env)
 	}
 }
 
+t_env	*create_env_from_string(char *str)
+{
+	t_env	*node;
+
+	node = malloc(sizeof(t_env));
+	if (!node)
+		return (NULL);
+	if (!extract_key_value(str, &node->key, &node->value))
+	{
+		free(node->key);
+		free(node->value);
+		free(node);
+		return (NULL);
+	}
+	node->has_equal = 1;
+	node->next = NULL;
+	return (node);
+}
+
 t_env	*init_env(char **envp)
 {
 	t_env	*env;
@@ -78,22 +97,12 @@ t_env	*init_env(char **envp)
 	env = NULL;
 	while (envp[i] != NULL)
 	{
-		node = malloc(sizeof(t_env));
+		node = create_env_from_string(envp[i]);
 		if (!node)
 		{
 			free_envs(env);
 			return (NULL);
 		}
-		if (!extract_key_value(envp[i], &node->key, &node->value))
-		{
-			free(node->key);
-			free(node->value);
-			free(node);
-			free_envs(env);
-			return (NULL);
-		}
-		node->has_equal = 1;
-		node->next = NULL;
 		ft_lstadd_back_env(&env, node);
 		i++;
 	}

@@ -11,112 +11,81 @@
 /* ************************************************************************** */
 #include "minishell.h"
 
-void	print_export(t_env *env)
+int	update_export_node(t_export *data)
 {
-	while (env)
+	char	*new_value;
+
+	if (!data->has_equal)
+		return (0);
+	new_value = ft_strdup(data->value);
+	if (!new_value)
+		return (1);
+	free(data->node->value);
+	data->node->value = new_value;
+	data->node->has_equal = 1;
+	return (0);
+}
+
+int	add_export_node(t_export *data, t_shell *shell)
+{
+	data->node = create_env_node(data->key, data->value);
+	if (!data->node)
+		return (1);
+	data->node->has_equal = data->has_equal;
+	ft_lstadd_back_env(&shell->env, data->node);
+	return (0);
+}
+
+int	save_export_arg(t_export *data, t_shell *shell)
+{
+	data->node = find_node(shell->env, data->key);
+	if (data->node)
+		return (update_export_node(data));
+	return (add_export_node(data, shell));
+}
+
+int	process_export_arg(char *arg, t_shell *shell, t_export *data)
+{
+	if (parse_export_arg(data, arg))
+		return (1);
+	if (!is_valid_name(data->key))
 	{
-		if (env->has_equal)
-			printf("declare -x %s=\"%s\"\n", env->key, env->value);
-		else
-			printf("declare -x %s\n", env->key);
-		env = env->next;
+		print_identifier_error("export", data->key, data->value);
+		data->status = 1;
+		free_export_data(data);
+		return (0);
 	}
-}
-
-static char	*get_export_key(char *arg)
-{
-	char	*equal;
-
-	equal = ft_strchr(arg, '=');
-	if (!equal)
-		return (ft_strdup(arg));
-	return (ft_substr(arg, 0, equal - arg));
-}
-
-static char	*get_export_value(char *arg)
-{
-	char	*equal;
-
-	equal = ft_strchr(arg, '=');
-	if (!equal)
-		return (NULL);
-	return (ft_strdup(equal + 1));
+	if (save_export_arg(data, shell))
+	{
+		free_export_data(data);
+		return (1);
+	}
+	free_export_data(data);
+	return (0);
 }
 
 int	export_env_func(char **args, t_shell *shell)
 {
-	t_env	*node;
-	char	*value;
-	char	*key;
-	char	*new_value;
-	int		status;
-	int		i;
-	int		has_equal;
+	t_export	data;
+	int			i;
 
-	status = 0;
-	i = 1;
-	has_equal = 0;
 	if (!args[1])
-		return (print_export(shell->env), shell->exit_status = 0, 0);
-	else
 	{
-		while (args[i])
-		{
-			has_equal = (ft_strchr(args[i], '=') != NULL);
-			key = get_export_key(args[i]);
-			value = get_export_value(args[i]);
-			if (!key || (has_equal && !value))
-			{
-				free(key);
-				free(value);
-				shell->exit_status = 1;
-				return (1);
-			}
-			if (!is_valid_name(key))
-			{
-				print_identifier_error("export", key, value);
-				status = 1;
-				free(key);
-				free(value);
-				i++;
-				continue ;
-			}
-			node = find_node(shell->env, key);
-			if (node)
-			{
-				if (has_equal)
-				{
-					new_value = ft_strdup(value);
-					if (!new_value)
-					{
-						free(key);
-						free(value);
-						shell->exit_status = 1;
-						return (1);
-					}
-					free(node->value);
-					node->value = new_value;
-					node->has_equal = 1;
-				}
-			}
-			else
-			{
-				node = create_env_node(key, value);
-				if (!node)
-				{
-					free(key);
-					free(value);
-					shell->exit_status = 1;
-					return (1);
-				}
-				node->has_equal = has_equal;
-				ft_lstadd_back_env(&shell->env, node);
-			}
-			free(key);
-			free(value);
-			i++;
-		}
+		print_export(shell->env);
+		shell->exit_status = 0;
+		return (0);
 	}
-	shell->exit_status = status;
+	ft_memset(&data, 0, sizeof(t_export));
+	i = 1;
+	while (args[i])
+	{
+		if (process_export_arg(args[i], shell, &data))
+		{
+			shell->exit_status = 1;
+			return (1);
+		}
+		i++;
+	}
+	shell->exit_status = data.status;
 	return (0);
 }
