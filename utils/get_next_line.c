@@ -88,10 +88,10 @@ static int	read_to_buff(char **b, int fd)
 	{
 		read_ret = read(fd, ret, BUFFER_SIZE);
 		if (read_ret < 0)
-			return (free(ret), NULL);
+			return (free(ret), 0);
 		ret[read_ret] = '\0';
-		if (read_ret > 0 && !str_append_mem(&b, ret, read_ret))
-			return (free(ret), NULL);
+		if (read_ret > 0 && !str_append_mem(b, ret, read_ret))
+			return (free(ret), 0);
 	}
 	free(ret);
 	return (1);

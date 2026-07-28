@@ -325,7 +325,7 @@ void			free_cmds(t_cmd *cmds);
 void			ft_lstadd_back_cmds(t_cmd **cmds, t_cmd *node);
 void			ft_lstadd_back_redirects(t_redir **redir, t_redir *node);
 int				has_quote(char *str);
-int				update_quote_state(char c, int *single, int *double_quote);
+int				update_quote_cmd_state(char c, int *single, int *double_quote);
 char			*removal_quote_only(char *str);
 int				set_heredoc_redirect(t_redir *redir, t_token *tokens);
 t_cmd			*init_cmds(t_token **tokens);
@@ -373,6 +373,8 @@ t_token			*create_token_node(char *value);
 int				add_token(t_token **tokens, char *value);
 int				fill_tokens(char *line, t_token **tokens, int *syntax_error);
 t_token			*create_tokens(char *line);
+void			skip_spaces(char *line, int *index);
+
 
 /*=================End========================= */
 #endif

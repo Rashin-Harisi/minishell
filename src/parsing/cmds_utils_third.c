@@ -42,7 +42,7 @@ int	has_quote(char *str)
 	return (0);
 }
 
-int	update_quote_state(char c, int *single, int *double_quote)
+int	update_quote_cmd_state(char c, int *single, int *double_quote)
 {
 	if (c == '\'' && !*double_quote)
 	{
@@ -74,7 +74,7 @@ char	*removal_quote_only(char *str)
 	double_quote = 0;
 	while (str[i])
 	{
-		if (!update_quote_state(str[i], &single_quote, &double_quote))
+		if (!update_quote_cmd_state(str[i], &single_quote, &double_quote))
 		{
 			expanded = append_char(expanded, str[i]);
 			if (!expanded)
