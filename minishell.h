@@ -40,6 +40,7 @@ typedef enum e_token_type	t_token_type;
 typedef struct s_token		t_token;
 typedef enum e_redir_type	t_redir_type;
 typedef struct s_redir		t_redir;
+typedef struct s_shell		t_shell;
 
 /*===================== marcos for custome terminal============*/
 # define GREEN "\001\033[32m\002"
@@ -70,7 +71,6 @@ typedef enum e_redir_type
 }	t_redir_type;
 
 /*===================Structs====================*/
-
 typedef struct s_shell
 {
 	t_env	*env;
@@ -120,6 +120,13 @@ typedef struct s_flags
 	int	single_quote;
 	int	double_quote;
 }	t_flags;
+
+typedef struct s_main
+{
+	t_shell	shell;
+	t_token	*tokens;
+	char	**paths;
+}	t_main;
 
 # ifndef BUFFER_SIZE
 # define BUFFER_SIZE 42

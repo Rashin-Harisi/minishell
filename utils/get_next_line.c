@@ -1,20 +1,20 @@
 /* ************************************************************************** */
-/*																			  */
-/*														  :::	   ::::::::   */
-/*	 get_next_line.c									:+:		 :+:	:+:   */
-/*													  +:+ +:+		  +:+	  */
-/*	 By: rabdolho <rabdolho@student.42vienna.com>	+#+  +:+	   +#+		  */
-/*												  +#+#+#+#+#+	+#+			  */
-/*	 Created: 2026/07/26 19:37:15 by rabdolho		   #+#	  #+#			  */
-/*	 Updated: 2026/07/26 19:37:15 by rabdolho		  ###	########.fr		  */
-/*																			  */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: pmoser <pmoser@student.42vienna.com>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/07/22 04:54:45 by pmoser            #+#    #+#             */
+/*   Updated: 2026/07/28 12:33:32 by rabdolho         ###   ########.fr       */
+/*                                                                            */
 /* ************************************************************************** */
 #include "minishell.h"
 
-char	*extract_line(char *s, int c)
+static char	*extract_line(char *s, int c)
 {
-	int		i;
 	char	*tmp;
+	int		i;
 
 	i = 0;
 	if (!s || !*s)
@@ -23,7 +23,7 @@ char	*extract_line(char *s, int c)
 		i++;
 	if (s[i] == c)
 		i++;
-	tmp = malloc((i + 1) * sizeof(char));
+	tmp = malloc((i +1) * sizeof(char));
 	if (!tmp)
 		return (NULL);
 	tmp[i] = '\0';
@@ -35,20 +35,10 @@ char	*extract_line(char *s, int c)
 	return (tmp);
 }
 
-void	*ft_memcpy(void *dest, const void *src, size_t n)
+static int	str_append_mem(char **s1, char *s2, size_t size2)
 {
-	while (n > 0)
-	{
-		((char *)dest)[n - 1] = ((char *)src)[n - 1];
-		n--;
-	}
-	return (dest);
-}
-
-int	str_append_mem(char **s1, char *s2, size_t size2)
-{
-	size_t	size1;
 	char	*tmp;
+	size_t	size1;
 
 	if (!*s1)
 	{
@@ -69,38 +59,7 @@ int	str_append_mem(char **s1, char *s2, size_t size2)
 	return (1);
 }
 
-int	str_append_str(char **s1, char *s2)
-{
-	return (str_append_mem(s1, s2, ft_strlen(s2)));
-}
-
-void	*ft_memmove(void *dest, const void *src, size_t n)
-{
-	size_t	i;
-
-	i = 0;
-	if (dest == src || n == 0)
-		return (dest);
-	if (dest < src)
-	{
-		while (i < n)
-		{
-			((char *)dest)[i] = ((char *)src)[i];
-			i++;
-		}
-	}
-	else if (dest > src)
-	{
-		while (n > 0)
-		{
-			((char *)dest)[n - 1] = ((char *)src)[n - 1];
-			n--;
-		}
-	}
-	return (dest);
-}
-
-int	new_line_exist(char *line)
+static int	new_line_exist(char *line)
 {
 	int	i;
 
@@ -116,39 +75,41 @@ int	new_line_exist(char *line)
 	return (0);
 }
 
+static int	read_to_buff(char **b, int fd)
+{
+	char	*ret;
+	int		read_ret;
+
+	ret = malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	if (!ret)
+		return (0);
+	read_ret = 1;
+	while (!new_line_exist(*b) && read_ret > 0)
+	{
+		read_ret = read(fd, ret, BUFFER_SIZE);
+		if (read_ret < 0)
+			return (free(ret), NULL);
+		ret[read_ret] = '\0';
+		if (read_ret > 0 && !str_append_mem(&b, ret, read_ret))
+			return (free(ret), NULL);
+	}
+	free(ret);
+	return (1);
+}
+
 char	*get_next_line(int fd)
 {
-	size_t		len_b;
-	size_t		len_l;
 	char		*line;
 	static char	*b;
-	int			read_ret;
-	char		*ret;
+	size_t		len_b;
+	size_t		len_l;
 
 	if (fd < 0 || BUFFER_SIZE <= 0)
 		return (NULL);
 	if (!b)
 		b = NULL;
-	ret = malloc((BUFFER_SIZE + 1) * sizeof(char));
-	if (!ret)
+	if (!read_to_buff(&b, fd))
 		return (NULL);
-	read_ret = 1;
-	while (!new_line_exist(b) && read_ret > 0)
-	{
-		read_ret = read(fd, ret, BUFFER_SIZE);
-		if (read_ret < 0)
-		{
-			free(ret);
-			return (NULL);
-		}
-		ret[read_ret] = '\0';
-		if (read_ret > 0 && !str_append_mem(&b, ret, read_ret))
-		{
-			free(ret);
-			return (NULL);
-		}
-	}
-	free(ret);
 	if (!b || *b == '\0')
 		return (NULL);
 	line = extract_line(b, '\n');

@@ -22,6 +22,17 @@ char	*join_free(char *s1, char *s2)
 	return (res);
 }
 
+char	*build_prompt(char *prompt, char *user, char *cwd)
+{
+	prompt = join_free(prompt, CYAN);
+	prompt = join_free(prompt, user);
+	prompt = join_free(prompt, RESET " ~");
+	prompt = join_free(prompt, BLUE);
+	prompt = join_free(prompt, cwd);
+	prompt = join_free(prompt, RESET " $ ");
+	return (prompt);
+}
+
 char	*create_prompt(t_shell *shell)
 {
 	char	cwd[PATH_MAX];
@@ -39,23 +50,5 @@ char	*create_prompt(t_shell *shell)
 		user = "minishell";
 	if (!getcwd(cwd, sizeof(cwd)))
 		return (join_free(prompt, CYAN "minishell" RESET " $ "));
-	prompt = join_free(prompt, CYAN);
-	if (!prompt)
-		return (NULL);
-	prompt = join_free(prompt, user);
-	if (!prompt)
-		return (NULL);
-	prompt = join_free(prompt, RESET " ~");
-	if (!prompt)
-		return (NULL);
-	prompt = join_free(prompt, BLUE);
-	if (!prompt)
-		return (NULL);
-	prompt = join_free(prompt, cwd);
-	if (!prompt)
-		return (NULL);
-	prompt = join_free(prompt, RESET " $ ");
-	if (!prompt)
-		return (NULL);
-	return (prompt);
+	return (build_prompt(prompt, user, cwd));
 }
