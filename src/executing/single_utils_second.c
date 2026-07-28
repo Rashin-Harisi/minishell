@@ -55,7 +55,7 @@ int	execute_external_command(t_cmd *cmd, char **paths, t_shell *shell)
 	return (wait_external_child(shell, pid, pathname));
 }
 
-int	restore_standard_fds(int saved_stdin, int saved_stdout)
+int	restore_standard_single_fds(int saved_stdin, int saved_stdout)
 {
 	int	error;
 

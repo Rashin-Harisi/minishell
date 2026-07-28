@@ -65,19 +65,6 @@ int	check_redirection(t_cmd *cmds)
 	return (0);
 }
 
-int	save_standard_fds(int saved[2])
-{
-	saved[0] = dup(STDIN_FILENO);
-	saved[1] = dup(STDOUT_FILENO);
-	if (saved[0] != -1 && saved[1] != -1)
-		return (0);
-	if (saved[0] != -1)
-		close(saved[0]);
-	if (saved[1] != -1)
-		close(saved[1]);
-	return (1);
-}
-
 int	restore_standard_fds(int saved[2])
 {
 	int	status;

@@ -16,7 +16,7 @@ int	handle_builtin_redirection(t_shell *shell, t_cmd *cmd,
 {
 	if (!apply_redirection(cmd->redirects))
 		return (0);
-	restore_standard_fds(saved[0], saved[1]);
+	restore_standard_single_fds(saved[0], saved[1]);
 	shell->exit_status = 1;
 	return (1);
 }
@@ -34,7 +34,7 @@ int	builtin_with_redirection(t_shell *shell, t_token **tokens)
 	if (handle_builtin_redirection(shell, shell->cmds, saved))
 		return (1);
 	ret = builtin_functions(shell, tokens);
-	if (restore_standard_fds(saved[0], saved[1]))
+	if (restore_standard_single_fds(saved[0], saved[1]))
 	{
 		shell->exit_status = 1;
 		ret = 1;
