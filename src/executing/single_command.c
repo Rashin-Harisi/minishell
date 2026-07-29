@@ -45,6 +45,7 @@ int	builtin_with_redirection(t_shell *shell, t_token **tokens)
 int	execute_single_command(t_shell *shell, char **paths, t_token **tokens)
 {
 	t_cmd	*cmds;
+	int		status;
 
 	cmds = shell->cmds;
 	if (!cmds->args || !cmds->args[0])
@@ -52,8 +53,12 @@ int	execute_single_command(t_shell *shell, char **paths, t_token **tokens)
 	if (is_builtin(cmds->args))
 	{
 		if (cmds->redirects)
-			return (builtin_with_redirection(shell, tokens));
-		return (builtin_functions(shell, tokens));
+			status = builtin_with_redirection(shell, tokens);
+		else
+			status = builtin_functions(shell, tokens);
+		if (status != 2)
+			shell->exit_status = status;
+		return (status);
 	}
 	return (execute_external_command(cmds, paths, shell));
 }
