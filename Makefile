@@ -1,3 +1,9 @@
+RED     = \033[31m
+GREEN   = \033[32m
+MAGENTA = \033[35m
+CYAN    = \033[36m
+RESET   = \033[0m
+
 NAME		= minishell
 HEADER      = minishell.h libft/libft.h
 
@@ -67,23 +73,27 @@ CFLAGS	= -Wall -Wextra -Werror -g -I.
 all: $(NAME)
 
 $(NAME): $(LIBFT) $(MANDATORY_OBJ)
-	$(CC) $(CFLAGS) $(MANDATORY_OBJ) $(LIBFT) -lreadline -o $(NAME)
-	@echo "Mandatory part is built."
+	@printf "$(GREEN)Linking $(NAME)...$(RESET)\n"
+	@$(CC) $(CFLAGS) $(MANDATORY_OBJ) $(LIBFT) -lreadline -o $(NAME)
+	@printf "$(GREEN)Mandatory part is built.$(RESET)\n"
 
 $(LIBFT):
-	$(MAKE) -C $(LIBFT_PATH)
-	cp $(LIBFT_PATH)/libft.a .
+	@printf "$(CYAN)Building libft...$(RESET)\n"
+	@$(MAKE) --no-print-directory -s -C $(LIBFT_PATH)
+	@cp $(LIBFT_PATH)/libft.a .
 
 %.o: %.c $(HEADER)
-	$(CC) $(CFLAGS) -c $< -o $@
+	@$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(MANDATORY_OBJ)
-	$(MAKE) clean -C $(LIBFT_PATH)
+	@printf "$(RED)Removing object files... $(RESET)\n"
+	@rm -f $(MANDATORY_OBJ)
+	@$(MAKE) clean --no-print-directory -s -C $(LIBFT_PATH)
 
 fclean: clean
-	rm -f $(NAME) libft.a libftprintf.a
-	$(MAKE) fclean -C $(LIBFT_PATH)
+	@printf "$(MAGENTA)Removing $(NAME) and $(LIBFT)... $(RESET)\n"
+	@rm -f $(NAME) libft.a libftprintf.a
+	@$(MAKE) fclean --no-print-directory -s -C $(LIBFT_PATH)
 
 re: fclean all
 

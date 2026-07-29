@@ -53,6 +53,7 @@ void	init_main(t_main *data, char **envp)
 		data->shell.env = init_env(envp);
 	data->paths = NULL;
 	data->shell.interactive = isatty(STDIN_FILENO);
+	data->shell.exit_status = 0;
 }
 
 char	*read_shell_line(t_shell *shell)
