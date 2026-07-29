@@ -46,7 +46,7 @@ void	remove_empty_args(char **args)
 
 void	init_main(t_main *data, char **envp)
 {
-	ft_memset(data, 0, sizeof(data));
+	ft_memset(data, 0, sizeof(*data));
 	if (envp[0] == NULL)
 		data->shell.env = create_minimal_envp();
 	else
