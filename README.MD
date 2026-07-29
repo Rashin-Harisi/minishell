@@ -94,6 +94,41 @@ The implementation follows Bash behavior as closely as possible within the manda
 
 ---
 
+<p align="center">
+  <img src="images/architecture.svg" alt="Minishell architecture" width="900">
+</p>
+
+## Parsing Flow
+
+<p align="center">
+  <img src="images/parsing-flow.svg" alt="Parsing flow" width="900">
+</p>
+
+## Execution Flow
+
+<p align="center">
+  <img src="images/execution-flow.svg" alt="Execution flow" width="900">
+</p>
+
+## Pipelines
+
+<p align="center">
+  <img src="images/pipeline.svg" alt="Pipeline execution" width="900">
+</p>
+
+## Redirections
+
+<p align="center">
+  <img src="images/redirections.svg" alt="Redirections and file descriptors" width="900">
+</p>
+
+## Project Structure
+
+<p align="center">
+  <img src="images/project-structure.svg" alt="Project structure" width="900">
+</p>
+
+
 # Instructions
 
 ## Requirements
