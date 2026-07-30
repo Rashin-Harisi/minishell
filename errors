@@ -1,0 +1,15 @@
+export 3hi (Export failures in general)
+bash: Returns 1
+Minish: Returns 0
+
+BIG ERROR: AFTER EXIT FAILS -> ALL PATH ARGS FAIL UNTIL DEFINED PATH IS MADE(/bin/ls)
+
+ctrl + c is supposed to have exit code = 130, even on empty prompts (But not on pipelines like cat | cat | ls) (takes exit code from ls)
+
+ctrl + c exits heredoc in bash (doesn't happen in minishell), return 130.
+
+echo ${USER}test returns usertest in bash, but ${USER}test in minishell (Skip this if low on time, subject doesn't say it needs to be handled)
+
+export SORTS env --> not done in minishell.
+
+(I've removed a few that aren't important / mentioned in subject.)
