@@ -66,6 +66,11 @@ char	*read_shell_line(t_shell *shell)
 		prompt = create_prompt(shell);
 		line = readline(prompt);
 		free(prompt);
+		if (g_signal == SIGINT)
+		{
+			shell->exit_status = 130;
+			g_signal = 0;
+		}
 		return (line);
 	}
 	line = get_next_line(STDIN_FILENO);
