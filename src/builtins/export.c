@@ -87,5 +87,5 @@ int	export_env_func(char **args, t_shell *shell)
 		i++;
 	}
 	shell->exit_status = data.status;
-	return (0);
+	return (data.status);
 }
