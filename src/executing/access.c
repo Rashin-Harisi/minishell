@@ -59,8 +59,6 @@ char	*search_paths(char **paths, char *cmd, t_shell *shell)
 				&found_not_executable);
 		if (pathname)
 			return (pathname);
-		if (shell->exit_status == 1)
-			return (NULL);
 		i++;
 	}
 	print_command_error(cmd, shell, found_not_executable);
