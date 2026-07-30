@@ -374,6 +374,9 @@ int				add_token(t_token **tokens, char *value);
 int				fill_tokens(char *line, t_token **tokens, int *syntax_error);
 t_token			*create_tokens(char *line);
 void			skip_spaces(char *line, int *index);
+void			set_heredoc_signals(void);
+void			set_signal_action(int signum, void (*handler)(int));
+int				run_heredoc(int fd, t_redir *redir, t_shell *shell);
 
 /*=================End========================= */
 #endif

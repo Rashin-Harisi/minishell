@@ -75,7 +75,7 @@ int	prepare_reading_file(t_redir *redir, t_shell *shell)
 		free(filename);
 		return (1);
 	}
-	if (read_heredoc(fd, redir, shell))
+	if (run_heredoc(fd, redir, shell))
 		return (heredoc_error(fd, filename));
 	return (finish_heredoc(redir, fd, filename));
 }

@@ -62,7 +62,8 @@ int	prepare_commands(t_main *data)
 		return (1);
 	if (heredoc_preparation(data->shell.cmds, &data->shell))
 	{
-		data->shell.exit_status = 1;
+		if (data->shell.exit_status != 130)
+			data->shell.exit_status = 1;
 		return (1);
 	}
 	return (0);

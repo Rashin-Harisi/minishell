@@ -23,7 +23,7 @@ static void	handle_prompt_sigint(int sig)
 	rl_redisplay();
 }
 
-static void	set_signal_action(int signum, void (*handler)(int))
+void	set_signal_action(int signum, void (*handler)(int))
 {
 	struct sigaction	sa;
 

@@ -60,7 +60,8 @@ MANDATORY_SRC	= main.c\
 				./src/executing/single_command.c \
 				./src/executing/single_utils_first.c \
 				./src/executing/single_utils_second.c \
-				./src/executing/utils.c 
+				./src/executing/utils.c \
+				./src/heardoc_prepration/utils_second.c
 
 MANDATORY_OBJ	= $(MANDATORY_SRC:.c=.o)
 
