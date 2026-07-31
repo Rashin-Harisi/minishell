@@ -69,13 +69,7 @@ char	*check_access_pathname(char **paths, char *cmd, t_shell *shell)
 {
 	if (!cmd || !cmd[0])
 		return (NULL);
-	if (ft_strchr(cmd, '/'))
+	if (ft_strchr(cmd, '/') || !paths)
 		return (check_direct_path(cmd, shell));
-	if (!paths)
-	{
-		shell->exit_status = 127;
-		print_error(cmd, ": command not found\n");
-		return (NULL);
-	}
 	return (search_paths(paths, cmd, shell));
 }
