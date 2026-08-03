@@ -21,7 +21,7 @@ int	expansion_tokens(t_token *tokens, t_shell *shell)
 	prev = NULL;
 	while (tmp)
 	{
-		if (tmp->type == TOKEN_WORD && !(prev && prev->type == TOKEN_HEREDOC))
+		if (tmp->type == TOKEN_WORD && !(prev && is_redirection_token(prev->type)))
 		{
 			expanded = expansion_string(tmp->value, shell);
 			if (!expanded)
